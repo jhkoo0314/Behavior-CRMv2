@@ -9,7 +9,9 @@ import { requireAnyRole } from '@/lib/auth/check-role';
 import { USER_ROLES } from '@/constants/user-roles';
 import { TeamBehaviorRanking } from '@/components/manager/team-behavior-ranking';
 import { TeamRiskList } from '@/components/manager/team-risk-list';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { HospitalRiskMap } from '@/components/manager/hospital-risk-map';
+import { CompetitorHeatmap } from '@/components/manager/competitor-heatmap';
+import { TeamGoals } from '@/components/manager/team-goals';
 
 export default async function ManagerPage() {
   // 관리자만 접근 가능
@@ -32,30 +34,14 @@ export default async function ManagerPage() {
         <TeamRiskList />
       </div>
 
-      {/* 향후 추가될 기능들 */}
+      {/* 병원 위험 지도 및 경쟁사 활동 */}
       <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>병원 위험 지도</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              병원 위험 지도 기능은 향후 구현 예정입니다.
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>경쟁사 활동 히트맵</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              경쟁사 활동 히트맵 기능은 향후 구현 예정입니다.
-            </p>
-          </CardContent>
-        </Card>
+        <HospitalRiskMap />
+        <CompetitorHeatmap />
       </div>
+
+      {/* 팀 목표 달성 현황 */}
+      <TeamGoals />
     </div>
   );
 }

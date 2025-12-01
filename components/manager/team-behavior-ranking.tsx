@@ -19,7 +19,6 @@ import {
 } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getTeamMembers } from '@/actions/users/get-team-members';
-import { getUserIdByClerkId } from '@/lib/supabase/get-user-id';
 import { getBehaviorScoresByUser } from '@/actions/behavior-scores/get-behavior-scores-by-user';
 import { calculatePeriod } from '@/lib/utils/chart-data';
 import { formatNumber } from '@/lib/utils/chart-data';
@@ -57,12 +56,12 @@ export function TeamBehaviorRanking() {
         const memberScores: TeamMemberScore[] = [];
 
         for (const member of teamMembersResult.data) {
-          const userUuid = await getUserIdByClerkId(member.clerk_id);
-          if (!userUuid) continue;
+          // member.id는 이미 UUID입니다 (getTeamMembers가 select('*')로 반환)
+          if (!member.id) continue;
 
           // 각 팀원의 Behavior Score 조회
           const scores = await getBehaviorScoresByUser({
-            userId: userUuid,
+            userId: member.id,
             periodStart: start,
             periodEnd: end,
           });

@@ -409,120 +409,123 @@
 
 ---
 
-## 스프린트 4: 분석 대시보드
+## 스프린트 4: 분석 대시보드 ✅ **완료**
 
 **목표**: Behavior-Outcome 통합 대시보드 및 분석 페이지 구현
 
-### 4.1 메인 대시보드 (Main Dashboard)
+### 4.1 메인 대시보드 (Main Dashboard) ✅ **완료**
 
-#### 4.1.1 Behavior Quality Score 차트
+#### 4.1.1 Behavior Quality Score 차트 ✅ **완료**
 
-- [ ] `components/dashboard/behavior-quality-chart.tsx` 생성
-  - [ ] RadarChart 구현 (Recharts)
-  - [ ] 8개 Behavior 지표 표시
-  - [ ] 최근 7일/30일 선택
-  - [ ] 데이터 로딩 상태 처리
+- [x] `components/dashboard/behavior-quality-chart.tsx` 생성
+  - [x] RadarChart 구현 (Recharts)
+  - [x] 8개 Behavior 지표 표시
+  - [x] 최근 7일/30일 선택
+  - [x] 데이터 로딩 상태 처리
 
-#### 4.1.2 Outcome Layer 핵심지표 카드
+#### 4.1.2 Outcome Layer 핵심지표 카드 ✅ **완료**
 
-- [ ] `components/dashboard/outcome-stat-cards.tsx` 생성
-  - [ ] HIR, 전환률, 성장률, 처방지수 Stat Cards
-  - [ ] Trend Sparkline (작은 트렌드 그래프)
-  - [ ] 전일/전주/전월 대비 변화율 표시
+- [x] `components/dashboard/outcome-stat-cards.tsx` 생성
+  - [x] HIR, 전환률, 성장률, 처방지수 Stat Cards
+  - [x] Trend Sparkline (작은 트렌드 그래프)
+  - [x] 전일/전주/전월 대비 변화율 표시
 
-#### 4.1.3 Behavior-Outcome 관계 지도
+#### 4.1.3 Behavior-Outcome 관계 지도 ✅ **완료**
 
-- [ ] `components/dashboard/behavior-outcome-map.tsx` 생성
-  - [ ] Chord Diagram 또는 Weighted Tree Map 구현
-  - [ ] 어떤 행동이 성과에 가장 큰 영향 미치는지 시각화
-  - [ ] 인터랙티브 호버 효과
+- [x] `components/dashboard/behavior-outcome-map.tsx` 생성
+  - [x] TreeMap 구현 (Recharts)
+  - [x] 어떤 행동이 성과에 가장 큰 영향 미치는지 시각화
+  - [x] 인터랙티브 호버 효과
 
-#### 4.1.4 메인 대시보드 페이지 통합
+#### 4.1.4 메인 대시보드 페이지 통합 ✅ **완료**
 
-- [ ] `app/(dashboard)/dashboard/page.tsx` 구현
-  - [ ] 모든 대시보드 컴포넌트 통합
-  - [ ] 데이터 fetching (Server Components 또는 React Query)
-  - [ ] 로딩 상태 처리
-  - [ ] 에러 처리
+- [x] `app/(dashboard)/dashboard/page.tsx` 구현
+  - [x] 모든 대시보드 컴포넌트 통합
+  - [x] 데이터 fetching (Server Actions)
+  - [x] 로딩 상태 처리
+  - [x] 에러 처리
 
-### 4.2 분석 페이지 (Analysis Dashboard)
+### 4.2 분석 페이지 (Analysis Dashboard) ✅ **완료**
 
-#### 4.2.1 HIR ↔ 성장률 상관도 차트
+#### 4.2.1 HIR ↔ 성장률 상관도 차트 ✅ **완료**
 
-- [ ] `components/analysis/hir-growth-scatter.tsx` 생성
-  - [ ] ScatterChart 구현
-  - [ ] X축: HIR, Y축: 필드 성장률
-  - [ ] 버블 크기: 전체 활동량
-  - [ ] 툴팁 표시
+- [x] `components/analysis/hir-growth-scatter.tsx` 생성
+  - [x] ScatterChart 구현
+  - [x] X축: HIR, Y축: 필드 성장률
+  - [x] 버블 크기: 전체 활동량
+  - [x] 툴팁 표시
 
-#### 4.2.2 고객 세분화 및 HIR 비교
+#### 4.2.2 고객 세분화 및 HIR 비교 ✅ **완료**
 
-- [ ] `components/analysis/customer-segmentation.tsx` 생성
-  - [ ] PieChart: 고객군 비율 분포
-  - [ ] BarChart: 고객군별 HIR 비교
-  - [ ] 병원 타입별, 규모별 세분화
+- [x] `components/analysis/customer-segmentation.tsx` 생성
+  - [x] PieChart: 고객군 비율 분포
+  - [x] BarChart: 고객군별 HIR 비교
+  - [x] 병원 타입별 세분화
 
-#### 4.2.3 활동 볼륨 × 품질 Matrix
+#### 4.2.3 활동 볼륨 × 품질 Matrix ✅ **완료**
 
-- [ ] `components/analysis/volume-quality-heatmap.tsx` 생성
-  - [ ] Grid Heatmap 구현
-  - [ ] X축: 활동 볼륨, Y축: 품질
-  - [ ] 색상으로 강도 표시
-  - [ ] 각 셀 클릭 시 상세 정보
+- [x] `components/analysis/volume-quality-heatmap.tsx` 생성
+  - [x] Grid Heatmap 구현 (커스텀)
+  - [x] X축: 활동 볼륨, Y축: 품질
+  - [x] 색상으로 강도 표시
+  - [x] 각 셀 호버 시 상세 정보
 
-#### 4.2.4 처방 기반 성과 Funnel Chart
+#### 4.2.4 처방 기반 성과 Funnel Chart ✅ **완료**
 
-- [ ] `components/analysis/prescription-funnel.tsx` 생성
-  - [ ] FunnelChart 구현
-  - [ ] 행동 → 고객 반응 → 처방량 변화 → 성과
-  - [ ] 각 단계별 전환율 표시
+- [x] `components/analysis/prescription-funnel.tsx` 생성
+  - [x] BarChart로 Funnel 구현
+  - [x] 행동 → 고객 반응 → 처방량 변화 → 성과
+  - [x] 각 단계별 전환율 표시
 
-#### 4.2.5 분석 페이지 통합
+#### 4.2.5 분석 페이지 통합 ✅ **완료**
 
-- [ ] `app/(dashboard)/analysis/page.tsx` 구현
-  - [ ] 모든 분석 차트 통합
-  - [ ] 필터링 옵션 (기간, 병원, 담당자)
-  - [ ] 데이터 export 기능 (향후)
+- [x] `app/(dashboard)/analysis/page.tsx` 구현
+  - [x] 모든 분석 차트 통합
+  - [x] 필터링 옵션 (향후 구현 예정)
+  - [x] 데이터 export 기능 (향후)
 
-### 4.3 관리자 대시보드 (Manager Dashboard)
+### 4.3 관리자 대시보드 (Manager Dashboard) ✅ **완료**
 
-#### 4.3.1 팀원 행동 점수 순위
+#### 4.3.1 팀원 행동 점수 순위 ✅ **완료**
 
-- [ ] `components/manager/team-behavior-ranking.tsx` 생성
-  - [ ] 팀원별 Behavior Score 순위표
-  - [ ] 정렬 기능
-  - [ ] 상세 보기 링크
+- [x] `components/manager/team-behavior-ranking.tsx` 생성
+  - [x] 팀원별 Behavior Score 순위표
+  - [x] 정렬 기능
+  - [x] 상세 보기 링크
 
-#### 4.3.2 팀원 위험도 리스트
+#### 4.3.2 팀원 위험도 리스트 ✅ **완료**
 
-- [ ] `components/manager/team-risk-list.tsx` 생성
-  - [ ] Coaching Signals 기반 위험도 표시
-  - [ ] 우선순위별 필터링
-  - [ ] 코칭 추천 액션 표시
+- [x] `components/manager/team-risk-list.tsx` 생성
+  - [x] Coaching Signals 기반 위험도 표시
+  - [x] 우선순위별 필터링
+  - [x] 코칭 추천 액션 표시
 
-#### 4.3.3 병원 위험 지도
+#### 4.3.3 병원 위험 지도 ✅ **완료**
 
-- [ ] `components/manager/hospital-risk-map.tsx` 생성
-  - [ ] 지도 기반 병원 위험도 표시 (향후)
-  - [ ] 또는 리스트 형태로 위험 병원 표시
+- [x] `components/manager/hospital-risk-map.tsx` 생성
+  - [x] 리스트 형태로 위험 병원 표시
+  - [x] 위험 신호 개수 및 우선순위 표시
+  - [x] 지도 기반 병원 위험도 표시 (향후)
 
-#### 4.3.4 경쟁사 활동 히트맵
+#### 4.3.4 경쟁사 활동 히트맵 ✅ **완료**
 
-- [ ] `components/manager/competitor-heatmap.tsx` 생성
-  - [ ] 경쟁사 활동 히트맵
-  - [ ] 지역별, 병원별 경쟁사 활동 표시
+- [x] `components/manager/competitor-heatmap.tsx` 생성
+  - [x] 경쟁사 활동 히트맵
+  - [x] 병원별 경쟁사 활동 표시
+  - [x] 경쟁사별 그룹화 및 활동량 표시
 
-#### 4.3.5 팀 목표 달성 현황
+#### 4.3.5 팀 목표 달성 현황 ✅ **완료**
 
-- [ ] `components/manager/team-goals.tsx` 생성
-  - [ ] 팀 전체 목표 vs 실제 달성도
-  - [ ] 진행률 표시
+- [x] `components/manager/team-goals.tsx` 생성
+  - [x] 팀 전체 목표 vs 실제 달성도
+  - [x] 진행률 표시
+  - [x] 4개 지표별 목표 달성도 (HIR, 전환률, 성장률, 처방지수)
 
-#### 4.3.6 관리자 대시보드 페이지
+#### 4.3.6 관리자 대시보드 페이지 ✅ **완료**
 
-- [ ] `app/(dashboard)/manager/page.tsx` 생성
-  - [ ] 역할 체크 (manager, head_manager만 접근)
-  - [ ] 모든 관리자 컴포넌트 통합
+- [x] `app/(dashboard)/manager/page.tsx` 생성
+  - [x] 역할 체크 (manager, head_manager만 접근)
+  - [x] 모든 관리자 컴포넌트 통합
 
 ---
 

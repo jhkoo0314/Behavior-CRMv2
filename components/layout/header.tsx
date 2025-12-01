@@ -6,6 +6,7 @@
 
 'use client';
 
+import { useState, useEffect } from 'react';
 import { UserButton } from '@clerk/nextjs';
 import { Bell, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -23,6 +24,13 @@ interface HeaderProps {
 }
 
 export function Header({ onMenuClick }: HeaderProps) {
+  const [isMounted, setIsMounted] = useState(false);
+
+  // 클라이언트에서만 렌더링하도록 처리 (Hydration 에러 방지)
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   return (
     <header className="flex h-16 items-center justify-between border-b bg-background px-6">
       <div className="flex items-center gap-4">
@@ -48,14 +56,16 @@ export function Header({ onMenuClick }: HeaderProps) {
           {/* <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-destructive" /> */}
         </Button>
 
-        {/* 사용자 프로필 */}
-        <UserButton
-          appearance={{
-            elements: {
-              avatarBox: 'h-8 w-8',
-            },
-          }}
-        />
+        {/* 사용자 프로필 - 클라이언트에서만 렌더링 */}
+        {isMounted && (
+          <UserButton
+            appearance={{
+              elements: {
+                avatarBox: 'h-8 w-8',
+              },
+            }}
+          />
+        )}
       </div>
     </header>
   );

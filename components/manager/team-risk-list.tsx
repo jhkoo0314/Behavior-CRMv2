@@ -15,7 +15,6 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getCoachingSignals } from '@/actions/coaching-signals/get-signals';
 import { getTeamMembers } from '@/actions/users/get-team-members';
-import { getUserIdByClerkId } from '@/lib/supabase/get-user-id';
 import type { CoachingSignal } from '@/types/database.types';
 
 interface RiskItem {
@@ -46,9 +45,9 @@ export function TeamRiskList() {
         const teamMembersResult = await getTeamMembers({});
         const userMap = new Map<string, string>();
         for (const member of teamMembersResult.data) {
-          const userUuid = await getUserIdByClerkId(member.clerk_id);
-          if (userUuid) {
-            userMap.set(userUuid, member.name);
+          // member.id는 이미 UUID입니다 (getTeamMembers가 select('*')로 반환)
+          if (member.id) {
+            userMap.set(member.id, member.name);
           }
         }
 
