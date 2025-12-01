@@ -15,7 +15,7 @@
 
 ---
 
-## 스프린트 1: 초기 스키마 + Auth + 기본 UI
+## 스프린트 1: 초기 스키마 + Auth + 기본 UI ✅ **완료**
 
 **목표**: 프로젝트 기반 구조 구축 및 핵심 데이터 모델 설계
 
@@ -23,7 +23,7 @@
 
 #### 1.1.1 Core 테이블 생성
 
-- [ ] `accounts` 테이블 생성
+- [x] `accounts` 테이블 생성 (crm_schema.sql에 포함됨)
   - [ ] 컬럼: id, name, address, phone, hospital_type, patient_count, revenue, created_at, updated_at
   - [ ] 인덱스: name, address
   - [ ] RLS 비활성화 (개발 단계)
@@ -91,97 +91,124 @@
 
 #### 1.2.1 디렉토리 구조 생성
 
-- [ ] `types/` 디렉토리 생성
-  - [ ] `database.types.ts` - Supabase 타입 정의
-  - [ ] `behavior.types.ts` - Behavior Layer 타입
-  - [ ] `outcome.types.ts` - Outcome Layer 타입
-- [ ] `actions/` 디렉토리 생성
+- [x] `types/` 디렉토리 생성
+  - [x] `database.types.ts` - Supabase 타입 정의
+  - [x] `behavior.types.ts` - Behavior Layer 타입
+  - [x] `outcome.types.ts` - Outcome Layer 타입
+- [x] `actions/` 디렉토리 생성
 
-  - [ ] Server Actions 기본 구조 준비
+  - [x] Server Actions 기본 구조 준비
 
-- [ ] `constants/` 디렉토리 생성
-  - [ ] `behavior-types.ts` - Behavior Layer 8개 지표 상수
-  - [ ] `outcome-types.ts` - Outcome Layer 4개 지표 상수
-  - [ ] `activity-types.ts` - Activity 타입 상수
+- [x] `constants/` 디렉토리 생성
+  - [x] `behavior-types.ts` - Behavior Layer 8개 지표 상수
+  - [x] `outcome-types.ts` - Outcome Layer 4개 지표 상수
+  - [x] `activity-types.ts` - Activity 타입 상수
+  - [x] `user-roles.ts` - 사용자 역할 상수
 
 #### 1.2.2 TypeScript 타입 정의
 
-- [ ] `types/database.types.ts` 작성
-  - [ ] 모든 테이블 타입 정의
-  - [ ] Supabase 자동 생성 타입과 통합
-- [ ] `types/behavior.types.ts` 작성
-  - [ ] BehaviorType enum
-  - [ ] ActivityType enum
-  - [ ] BehaviorScore 인터페이스
-- [ ] `types/outcome.types.ts` 작성
-  - [ ] Outcome 인터페이스
-  - [ ] HIR, 전환률, 성장률, 처방지수 타입
+- [x] `types/database.types.ts` 작성
+  - [x] 모든 테이블 타입 정의
+  - [ ] Supabase 자동 생성 타입과 통합 (마이그레이션 실행 후)
+- [x] `types/behavior.types.ts` 작성
+  - [x] BehaviorType enum
+  - [x] ActivityType enum
+  - [x] BehaviorScore 인터페이스
+- [x] `types/outcome.types.ts` 작성
+  - [x] Outcome 인터페이스
+  - [x] HIR, 전환률, 성장률, 처방지수 타입
 
 ### 1.3 인증 및 권한 구조
 
 #### 1.3.1 사용자 역할 관리
 
-- [ ] `users` 테이블에 `role` 컬럼 추가
-  - [ ] role: ENUM ('salesperson', 'manager', 'head_manager')
-  - [ ] 마이그레이션 작성
-- [ ] Clerk Metadata와 역할 동기화
-  - [ ] `app/api/sync-user/route.ts` 수정
-  - [ ] Clerk 사용자 메타데이터에서 role 읽기
+- [x] `users` 테이블에 `role` 컬럼 추가
+  - [x] role: TEXT with CHECK ('salesperson', 'manager', 'head_manager')
+  - [x] 마이그레이션 작성 (crm_schema.sql에 포함됨)
+- [x] Clerk Metadata와 역할 동기화
+  - [x] `app/api/sync-user/route.ts` 수정
+  - [x] Clerk 사용자 메타데이터에서 role 읽기
 
 #### 1.3.2 권한 체크 유틸리티
 
-- [ ] `lib/auth/check-role.ts` 생성
-  - [ ] 현재 사용자 역할 확인 함수
-  - [ ] 역할별 접근 권한 체크 함수
+- [x] `lib/auth/check-role.ts` 생성
+  - [x] 현재 사용자 역할 확인 함수
+  - [x] 역할별 접근 권한 체크 함수
+- [x] `lib/auth/permissions.ts` 생성
+  - [x] 역할별 접근 권한 매트릭스 정의
+  - [x] 데이터 접근 권한 체크 함수
 
 ### 1.4 기본 UI 컴포넌트
 
 #### 1.4.1 레이아웃 컴포넌트
 
-- [ ] `components/layout/app-layout.tsx` 생성
+- [x] `components/layout/app-layout.tsx` 생성
 
-  - [ ] 사이드바 네비게이션
-  - [ ] 헤더 (사용자 정보, 알림)
-  - [ ] 모바일 반응형 처리
+  - [x] 사이드바 네비게이션
+  - [x] 헤더 (사용자 정보, 알림)
+  - [x] 모바일 반응형 처리 (Sheet 컴포넌트 사용)
 
-- [ ] `components/layout/sidebar.tsx` 생성
-  - [ ] 메뉴 항목: Dashboard, Analysis, Growth, Activities, Outcomes
-  - [ ] 역할별 메뉴 표시/숨김
+- [x] `components/layout/sidebar.tsx` 생성
+  - [x] 메뉴 항목: Dashboard, Analysis, Growth, Activities, Outcomes, Manager
+  - [x] 역할별 메뉴 표시/숨김 로직
+- [x] `components/layout/header.tsx` 생성
+  - [x] 사용자 프로필 드롭다운
+  - [x] 알림 아이콘 (향후 구현 준비)
+  - [x] 모바일 메뉴 토글 버튼
 
 #### 1.4.2 공통 컴포넌트
 
-- [ ] `components/ui/card.tsx` (shadcn 설치)
-- [ ] `components/ui/button.tsx` (shadcn 설치)
-- [ ] `components/ui/input.tsx` (shadcn 설치)
-- [ ] `components/ui/select.tsx` (shadcn 설치)
-- [ ] `components/ui/badge.tsx` (shadcn 설치)
-- [ ] `components/ui/table.tsx` (shadcn 설치)
+- [x] `components/ui/card.tsx` (shadcn 설치)
+- [x] `components/ui/button.tsx` (shadcn 설치)
+- [x] `components/ui/input.tsx` (shadcn 설치)
+- [x] `components/ui/select.tsx` (shadcn 설치)
+- [x] `components/ui/badge.tsx` (shadcn 설치)
+- [x] `components/ui/table.tsx` (shadcn 설치)
+- [x] `components/ui/dropdown-menu.tsx` (shadcn 설치)
+- [x] `components/ui/sheet.tsx` (shadcn 설치)
+- [x] `components/ui/skeleton.tsx` (shadcn 설치)
 
 #### 1.4.3 차트 라이브러리 설정
 
-- [ ] Recharts 설치: `pnpm add recharts`
-- [ ] `components/charts/chart-wrapper.tsx` 생성
-  - [ ] 공통 차트 래퍼 컴포넌트
-  - [ ] 로딩 상태 처리
-  - [ ] 에러 처리
+- [x] Recharts 설치: `pnpm add recharts`
+- [x] `components/charts/chart-wrapper.tsx` 생성
+  - [x] 공통 차트 래퍼 컴포넌트
+  - [x] 로딩 상태 처리 (Skeleton UI)
+  - [x] 에러 상태 처리
+  - [x] 빈 데이터 상태 처리
 
 ### 1.5 기본 페이지 라우팅
 
 #### 1.5.1 페이지 구조 생성
 
-- [ ] `app/(dashboard)/layout.tsx` 생성
-  - [ ] AppLayout 적용
-  - [ ] 인증 체크
-- [ ] `app/(dashboard)/dashboard/page.tsx` 생성
-  - [ ] 기본 대시보드 페이지 (임시)
-- [ ] `app/(dashboard)/analysis/page.tsx` 생성
-  - [ ] 분석 페이지 (임시)
-- [ ] `app/(dashboard)/growth/page.tsx` 생성
-  - [ ] 성장 맵 페이지 (임시)
-- [ ] `app/(dashboard)/activities/page.tsx` 생성
-  - [ ] 활동 기록 페이지 (임시)
-- [ ] `app/(dashboard)/outcomes/page.tsx` 생성
-  - [ ] 성과 리포트 페이지 (임시)
+- [x] `app/(dashboard)/layout.tsx` 생성
+  - [x] AppLayout 적용
+  - [x] 인증 체크 (Clerk)
+  - [x] 사용자 동기화 확인
+- [x] `app/(dashboard)/dashboard/page.tsx` 생성
+  - [x] 기본 대시보드 페이지 (임시)
+  - [x] PRD 4.1 구조 준비 (Behavior Quality Score, Outcome Layer 지표, Behavior-Outcome 관계 지도 영역)
+- [x] `app/(dashboard)/analysis/page.tsx` 생성
+  - [x] 분석 페이지 (임시)
+  - [x] PRD 4.2 구조 준비 (차트 영역)
+- [x] `app/(dashboard)/growth/page.tsx` 생성
+  - [x] 성장 맵 페이지 (임시)
+  - [x] PRD 4.3 구조 준비 (트렌드 차트 영역)
+- [x] `app/(dashboard)/activities/page.tsx` 생성
+  - [x] 활동 기록 페이지 (임시)
+- [x] `app/(dashboard)/outcomes/page.tsx` 생성
+  - [x] 성과 리포트 페이지 (임시)
+- [x] `app/(dashboard)/manager/page.tsx` 생성
+  - [x] 관리자 대시보드 페이지 (권한 체크 포함)
+
+#### 1.5.2 유틸리티 함수
+
+- [x] `lib/supabase/get-user-id.ts` 생성
+  - [x] Clerk clerk_id로 users 테이블에서 UUID id 조회
+  - [x] 캐싱 고려
+- [x] `lib/utils/date.ts` 생성
+  - [x] 기간 계산 함수 (7일, 30일 등)
+  - [x] 날짜 포맷팅 함수
 
 ---
 

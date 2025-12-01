@@ -25,19 +25,55 @@ export async function POST() {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    // Clerk에서 이메일 주소 가져오기
+    const email =
+      clerkUser.emailAddresses[0]?.emailAddress ||
+      clerkUser.username ||
+      null;
+
+    if (!email) {
+      return NextResponse.json(
+        { error: "Email address is required" },
+        { status: 400 }
+      );
+    }
+
+    // Clerk 메타데이터에서 role 읽기 (없으면 기본값 'salesperson')
+    const role =
+      (clerkUser.publicMetadata?.role as string) ||
+      (clerkUser.privateMetadata?.role as string) ||
+      'salesperson';
+
+    // role 유효성 검증
+    const validRoles = ['salesperson', 'manager', 'head_manager'];
+    const userRole = validRoles.includes(role) ? role : 'salesperson';
+
     // Supabase에 사용자 정보 동기화
+    console.group("🔐 [Sync User] Supabase 동기화 시작");
+    console.log("📋 사용자 정보:", {
+      clerk_id: clerkUser.id,
+      email: email,
+      name: clerkUser.fullName || clerkUser.username || email.split("@")[0] || "Unknown",
+      role: userRole,
+      team_id: (clerkUser.publicMetadata?.team_id as string) || null,
+    });
+
     const supabase = getServiceRoleClient();
+    console.log("✅ Service Role 클라이언트 생성 완료");
 
     const { data, error } = await supabase
       .from("users")
       .upsert(
         {
           clerk_id: clerkUser.id,
+          email: email,
           name:
             clerkUser.fullName ||
             clerkUser.username ||
-            clerkUser.emailAddresses[0]?.emailAddress ||
+            email.split("@")[0] ||
             "Unknown",
+          role: userRole,
+          team_id: (clerkUser.publicMetadata?.team_id as string) || null,
         },
         {
           onConflict: "clerk_id",
@@ -47,12 +83,22 @@ export async function POST() {
       .single();
 
     if (error) {
-      console.error("Supabase sync error:", error);
+      console.error("❌ Supabase sync error:", error);
+      console.error("📊 Error details:", {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint,
+      });
+      console.groupEnd();
       return NextResponse.json(
         { error: "Failed to sync user", details: error.message },
         { status: 500 }
       );
     }
+
+    console.log("✅ 사용자 동기화 성공:", data);
+    console.groupEnd();
 
     return NextResponse.json({
       success: true,
