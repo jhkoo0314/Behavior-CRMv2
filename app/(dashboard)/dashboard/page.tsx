@@ -11,6 +11,7 @@
 import { Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import { Skeleton } from '@/components/ui/skeleton';
+import { SampleDataGenerator } from '@/components/dashboard/sample-data-generator';
 
 // 차트 컴포넌트 동적 import (코드 스플리팅)
 const BehaviorQualityChart = dynamic(
@@ -52,6 +53,9 @@ export default function DashboardPage() {
           현재 나의 행동 품질과 성과 수준을 한눈에 확인하세요.
         </p>
       </div>
+
+      {/* 샘플 데이터 생성기 */}
+      <SampleDataGenerator />
 
       <Suspense fallback={<DashboardSkeleton />}>
         {/* Outcome Layer 핵심지표 카드 */}
