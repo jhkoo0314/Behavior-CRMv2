@@ -41,6 +41,15 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  /* Brand colors (Emerald based) */
+  --color-brand-50: #f2fcf5;
+  --color-brand-100: #dcfce7;
+  --color-brand-500: #10b981;
+  --color-brand-600: #059669;
+  --color-brand-900: #064e3b;
+  /* Dark colors (Stone based) */
+  --color-dark-800: #1c1917;
+  --color-dark-900: #0c0a09;
 }
 
 :root {
@@ -122,4 +131,17 @@
   main {
     @apply max-w-7xl mx-auto pt-16 px-4;
   }
+}
+
+/* Chart line animation */
+@keyframes drawLine {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.chart-line {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: drawLine 2s ease-out forwards;
 }
