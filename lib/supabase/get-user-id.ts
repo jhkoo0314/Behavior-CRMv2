@@ -3,7 +3,12 @@
  * 
  * Clerk clerk_id로 users 테이블에서 UUID id를 조회합니다.
  * 캐싱을 고려하여 구현합니다.
+ * 
+ * 이 파일은 서버 전용입니다. 클라이언트 컴포넌트에서는
+ * actions/users/get-user-id-by-clerk-id.ts Server Action을 사용하세요.
  */
+
+'use server';
 
 import { auth } from '@clerk/nextjs/server';
 import { createClerkSupabaseClient } from './server';
@@ -32,7 +37,7 @@ export async function getCurrentUserId(): Promise<string | null> {
     }
 
     // Supabase에서 조회
-    const supabase = await createClerkSupabaseClient();
+    const supabase = createClerkSupabaseClient();
 
     const { data: user, error } = await supabase
       .from('users')

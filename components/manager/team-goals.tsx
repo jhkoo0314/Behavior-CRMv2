@@ -14,7 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getTeamMembers } from '@/actions/users/get-team-members';
 import { getOutcomesByUser } from '@/actions/outcomes/get-outcomes-by-user';
-import { getUserIdByClerkId } from '@/lib/supabase/get-user-id';
+import { getUserIdByClerkId } from '@/actions/users/get-user-id-by-clerk-id';
 import { calculatePeriod } from '@/lib/utils/chart-data';
 import { formatPercent } from '@/lib/utils/chart-data';
 
@@ -51,8 +51,9 @@ export function TeamGoals() {
         let memberCount = 0;
 
         for (const member of teamMembersResult.data) {
-          const userUuid = await getUserIdByClerkId(member.clerk_id);
-          if (!userUuid) continue;
+          const userIdResult = await getUserIdByClerkId({ clerkId: member.clerk_id });
+          if (userIdResult.error || !userIdResult.data) continue;
+          const userUuid = userIdResult.data;
 
           // 각 팀원의 Outcome 조회
           const outcomesResult = await getOutcomesByUser({
