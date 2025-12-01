@@ -19,12 +19,12 @@ import { BEHAVIOR_TYPE_LIST } from '@/constants/behavior-types';
 async function getBehaviorScoresForPeriod(
   userId: string,
   periodStart: Date,
-  periodEnd: Date,
-  accountId?: string
+  periodEnd: Date
+  // accountId는 behavior_scores 테이블에 없으므로 사용하지 않음
 ): Promise<BehaviorScore[]> {
   const supabase = await createClerkSupabaseClient();
 
-  let query = supabase
+  const query = supabase
     .from('behavior_scores')
     .select('*')
     .eq('user_id', userId)
@@ -69,11 +69,11 @@ export async function calculateHIR(
 
   try {
     // Behavior Score 조회
+    // accountId는 behavior_scores 테이블에 없으므로 전달하지 않음
     const behaviorScores = await getBehaviorScoresForPeriod(
       userId,
       periodStart,
-      periodEnd,
-      accountId
+      periodEnd
     );
 
     console.log('조회된 Behavior Score 수:', behaviorScores.length);

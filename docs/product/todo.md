@@ -326,84 +326,86 @@
 
 ---
 
-## 스프린트 3: Outcome Layer 구축
+## 스프린트 3: Outcome Layer 구축 ✅ **완료**
 
 **목표**: 행동 데이터를 기반으로 성과 지표 계산 및 저장
 
-### 3.1 Outcome 계산 엔진
+### 3.1 Outcome 계산 엔진 ✅ **완료**
 
 #### 3.1.1 HIR (High-Impact Rate) 계산
 
-- [ ] `lib/analytics/calculate-hir.ts` 생성
-  - [ ] HIR 계산 알고리즘 구현
-  - [ ] Behavior Layer와 Outcome Layer 연결 로직
-  - [ ] 병원별, 기간별 HIR 계산
+- [x] `lib/analytics/calculate-hir.ts` 생성
+  - [x] HIR 계산 알고리즘 구현
+  - [x] Behavior Layer와 Outcome Layer 연결 로직
+  - [x] 병원별, 기간별 HIR 계산
 
 #### 3.1.2 전환률(Conversion Rate) 계산
 
-- [ ] `lib/analytics/calculate-conversion-rate.ts` 생성
-  - [ ] 행동 → 성과 전환율 계산
-  - [ ] 처방 증가율 기반 계산
+- [x] `lib/analytics/calculate-conversion-rate.ts` 생성
+  - [x] 행동 → 성과 전환율 계산
+  - [x] 처방 증가율 기반 계산
 
 #### 3.1.3 필드 성장률(Field Growth Rate) 계산
 
-- [ ] `lib/analytics/calculate-field-growth.ts` 생성
-  - [ ] 필드별 성장률 계산
-  - [ ] 전년 대비, 전월 대비 비교
+- [x] `lib/analytics/calculate-field-growth.ts` 생성
+  - [x] 필드별 성장률 계산
+  - [x] 전년 대비, 전월 대비 비교
 
 #### 3.1.4 처방 기반 성과지수 계산
 
-- [ ] `lib/analytics/calculate-prescription-index.ts` 생성
-  - [ ] 처방량 기반 성과지수 계산
-  - [ ] 가중치 적용
+- [x] `lib/analytics/calculate-prescription-index.ts` 생성
+  - [x] 처방량 기반 성과지수 계산
+  - [x] 가중치 적용
 
-### 3.2 Prescription (처방) 관리
+### 3.2 Prescription (처방) 관리 ✅ **완료**
 
 #### 3.2.1 Prescription CRUD
 
-- [ ] `actions/prescriptions/create-prescription.ts` 생성
-- [ ] `actions/prescriptions/get-prescriptions.ts` 생성
-- [ ] `actions/prescriptions/update-prescription.ts` 생성
-- [ ] `actions/prescriptions/delete-prescription.ts` 생성
+- [x] `actions/prescriptions/create-prescription.ts` 생성
+- [x] `actions/prescriptions/get-prescriptions.ts` 생성
+- [x] `actions/prescriptions/update-prescription.ts` 생성
+- [x] `actions/prescriptions/delete-prescription.ts` 생성
 
 #### 3.2.2 Prescription 입력 UI
 
-- [ ] `components/prescriptions/prescription-form.tsx` 생성
-  - [ ] 처방 정보 입력 폼
-  - [ ] 제품명, 수량, 처방일 등
+- [x] `components/prescriptions/prescription-form.tsx` 생성
+  - [x] 처방 정보 입력 폼
+  - [x] 제품명, 수량, 처방일 등
+- [x] `components/prescriptions/prescription-list.tsx` 생성
+  - [x] 처방 목록 표시 및 수정/삭제 기능
 
-### 3.3 Outcome 자동 계산 및 저장
+### 3.3 Outcome 자동 계산 및 저장 ✅ **완료**
 
 #### 3.3.1 Outcome 계산 및 저장 로직
 
-- [ ] `actions/outcomes/calculate-and-save.ts` 생성
-  - [ ] 주기별 Outcome 계산 (일별, 주별, 월별)
-  - [ ] 모든 Outcome 지표 계산
-  - [ ] `outcomes` 테이블에 저장
+- [x] `actions/outcomes/calculate-and-save.ts` 생성
+  - [x] 주기별 Outcome 계산 (일별, 주별, 월별)
+  - [x] 모든 Outcome 지표 계산
+  - [x] `outcomes` 테이블에 저장
 
 #### 3.3.2 Outcome 조회
 
-- [ ] `actions/outcomes/get-outcomes.ts` 생성
-  - [ ] 사용자별 Outcome 조회
-  - [ ] 기간별 필터링
-  - [ ] 병원별 필터링
+- [x] `actions/outcomes/get-outcomes.ts` 생성
+  - [x] 사용자별 Outcome 조회
+  - [x] 기간별 필터링
+  - [x] 병원별 필터링
 
-### 3.4 Behavior-Outcome 관계 분석
+### 3.4 Behavior-Outcome 관계 분석 ✅ **완료**
 
 #### 3.4.1 상관관계 분석 함수
 
-- [ ] `lib/analytics/analyze-behavior-outcome-correlation.ts` 생성
-  - [ ] 어떤 행동이 성과에 가장 큰 영향을 미치는지 분석
-  - [ ] 가중치 계산
+- [x] `lib/analytics/analyze-behavior-outcome-correlation.ts` 생성
+  - [x] 어떤 행동이 성과에 가장 큰 영향을 미치는지 분석
+  - [x] 가중치 계산
 
 #### 3.4.2 Analytics Cache 시스템
 
-- [ ] `actions/analytics-cache/get-cached-analytics.ts` 생성
-  - [ ] 캐시된 분석 데이터 조회
-  - [ ] 캐시 만료 체크
-- [ ] `actions/analytics-cache/save-cached-analytics.ts` 생성
-  - [ ] 계산된 분석 데이터 캐싱
-  - [ ] TTL 설정
+- [x] `actions/analytics-cache/get-cached-analytics.ts` 생성
+  - [x] 캐시된 분석 데이터 조회
+  - [x] 캐시 만료 체크
+- [x] `actions/analytics-cache/save-cached-analytics.ts` 생성
+  - [x] 계산된 분석 데이터 캐싱
+  - [x] TTL 설정
 
 ---
 
