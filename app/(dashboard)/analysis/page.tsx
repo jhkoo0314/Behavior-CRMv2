@@ -24,7 +24,7 @@ export default function AnalysisPage() {
         isEmpty={true}
         emptyMessage="데이터가 없습니다. 활동을 기록하면 상관도 차트가 표시됩니다."
       >
-        {/* ScatterChart는 스프린트 4에서 구현 */}
+        {null}
       </ChartWrapper>
 
       {/* 고객 세분화 및 HIR 비교 영역 (임시) */}
@@ -34,7 +34,7 @@ export default function AnalysisPage() {
         isEmpty={true}
         emptyMessage="데이터가 없습니다."
       >
-        {/* PieChart + BarChart는 스프린트 4에서 구현 */}
+        {null}
       </ChartWrapper>
 
       {/* 활동 볼륨 × 품질 Matrix 영역 (임시) */}
@@ -44,7 +44,7 @@ export default function AnalysisPage() {
         isEmpty={true}
         emptyMessage="데이터가 없습니다."
       >
-        {/* Grid Heatmap은 스프린트 4에서 구현 */}
+        {null}
       </ChartWrapper>
 
       {/* 처방 기반 성과 Funnel Chart 영역 (임시) */}
@@ -54,7 +54,7 @@ export default function AnalysisPage() {
         isEmpty={true}
         emptyMessage="데이터가 없습니다."
       >
-        {/* FunnelChart는 스프린트 4에서 구현 */}
+        {null}
       </ChartWrapper>
     </div>
   );
