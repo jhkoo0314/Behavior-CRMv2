@@ -24,7 +24,7 @@ export default function GrowthPage() {
         isEmpty={true}
         emptyMessage="데이터가 없습니다. 활동을 기록하면 트렌드 차트가 표시됩니다."
       >
-        {/* 라인 차트는 스프린트 5에서 구현 */}
+        {null}
       </ChartWrapper>
 
       {/* Outcome Layer 변화 차트 영역 (임시) */}
@@ -34,7 +34,7 @@ export default function GrowthPage() {
         isEmpty={true}
         emptyMessage="데이터가 없습니다."
       >
-        {/* 라인 차트는 스프린트 5에서 구현 */}
+        {null}
       </ChartWrapper>
 
       {/* 성장 추천 액션 영역 (임시) */}
@@ -44,7 +44,7 @@ export default function GrowthPage() {
         isEmpty={true}
         emptyMessage="데이터가 없습니다. 활동을 기록하면 추천 액션이 표시됩니다."
       >
-        {/* AI 추천 기능은 스프린트 5에서 구현 */}
+        {null}
       </ChartWrapper>
     </div>
   );

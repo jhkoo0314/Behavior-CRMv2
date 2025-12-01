@@ -25,7 +25,7 @@ export default function DashboardPage() {
         isEmpty={true}
         emptyMessage="데이터가 없습니다. 활동을 기록하면 차트가 표시됩니다."
       >
-        {/* RadarChart는 스프린트 2에서 구현 */}
+        {null}
       </ChartWrapper>
 
       {/* Outcome Layer 핵심지표 카드 영역 (임시) */}
@@ -75,7 +75,7 @@ export default function DashboardPage() {
         isEmpty={true}
         emptyMessage="데이터가 없습니다. 활동을 기록하면 관계 지도가 표시됩니다."
       >
-        {/* Chord Diagram 또는 Weighted Tree Map은 스프린트 2에서 구현 */}
+        {null}
       </ChartWrapper>
     </div>
   );

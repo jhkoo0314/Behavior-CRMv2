@@ -6,7 +6,8 @@
  * - 사용자 동기화 확인
  */
 
-import { auth, redirectToSignIn } from '@clerk/nextjs/server';
+import { auth } from '@clerk/nextjs/server';
+import { redirect } from 'next/navigation';
 import { AppLayout } from '@/components/layout/app-layout';
 import { createClerkSupabaseClient } from '@/lib/supabase/server';
 
@@ -19,8 +20,7 @@ export default async function DashboardLayout({
   const { userId } = await auth();
 
   if (!userId) {
-    redirectToSignIn();
-    return null;
+    redirect('/sign-in');
   }
 
   // 사용자 동기화 확인

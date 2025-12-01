@@ -73,8 +73,8 @@ export async function getUserIdByClerkId(clerkId: string): Promise<string | null
     }
 
     // Supabase에서 조회 (service role 사용 - 다른 사용자 조회 가능)
-    const { createServiceRoleClient } = await import('./service-role');
-    const supabase = createServiceRoleClient();
+    const { getServiceRoleClient } = await import('./service-role');
+    const supabase = getServiceRoleClient();
 
     const { data: user, error } = await supabase
       .from('users')
