@@ -8,13 +8,6 @@
 
 import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -23,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ActivityForm } from '@/components/activities/activity-form';
+import { ActivityDrawer } from '@/components/activities/activity-drawer';
 import { ActivityList } from '@/components/activities/activity-list';
 import { PlusIcon } from 'lucide-react';
 import { createActivity } from '@/actions/activities/create-activity';
@@ -56,20 +49,56 @@ export function ActivitiesClient({
 
   const handleCreate = async (data: ActivityFormData) => {
     console.group('ActivitiesPage: Activity 생성');
-    // ActivityFormData는 Zod 스키마에서 필수 필드들이 required이므로 타입 안전
-    const newActivity = await createActivity({
+    
+    // Optimistic Update: 임시 Activity 생성
+    const tempId = `temp-${Date.now()}`;
+    const tempActivity: Activity = {
+      id: tempId,
+      user_id: '', // 임시 값
       account_id: data.account_id,
-      contact_id: data.contact_id ?? null,
+      contact_id: data.contact_id,
       type: data.type,
       behavior: data.behavior,
-      description: data.description,
+      description: data.description || '',
       quality_score: data.quality_score,
       quantity_score: data.quantity_score,
-      duration_minutes: data.duration_minutes,
+      duration_minutes: data.duration_minutes || null,
       performed_at: new Date(data.performed_at).toISOString(),
-    });
-    setActivities((prev) => [newActivity, ...prev]);
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+
+    // 즉시 UI에 추가
+    setActivities((prev) => [tempActivity, ...prev]);
     setIsDialogOpen(false);
+
+    try {
+      // 실제 서버 요청
+      const newActivity = await createActivity({
+        account_id: data.account_id,
+        contact_id: data.contact_id ?? null,
+        type: data.type,
+        behavior: data.behavior,
+        description: data.description,
+        quality_score: data.quality_score,
+        quantity_score: data.quantity_score,
+        duration_minutes: data.duration_minutes,
+        performed_at: new Date(data.performed_at).toISOString(),
+      });
+
+      // 임시 항목을 실제 항목으로 교체
+      setActivities((prev) =>
+        prev.map((act) => (act.id === tempId ? newActivity : act))
+      );
+    } catch (error) {
+      console.error('Activity 생성 실패:', error);
+      // 실패 시 롤백: 임시 항목 제거
+      setActivities((prev) => prev.filter((act) => act.id !== tempId));
+      // Drawer 다시 열기
+      setIsDialogOpen(true);
+      throw error;
+    }
+
     console.groupEnd();
   };
 
@@ -221,27 +250,23 @@ export function ActivitiesClient({
           </Select>
         </div>
 
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <PlusIcon className="mr-2 size-4" />
-              활동 추가
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>
-                {editingActivity ? '활동 수정' : '활동 추가'}
-              </DialogTitle>
-            </DialogHeader>
-            <ActivityForm
-              activity={editingActivity}
-              accounts={accounts}
-              onSubmit={editingActivity ? handleUpdate : handleCreate}
-              onCancel={handleDialogClose}
-            />
-          </DialogContent>
-        </Dialog>
+        <Button onClick={() => setIsDialogOpen(true)}>
+          <PlusIcon className="mr-2 size-4" />
+          활동 추가
+        </Button>
+
+        <ActivityDrawer
+          open={isDialogOpen}
+          onOpenChange={(open) => {
+            setIsDialogOpen(open);
+            if (!open) {
+              setEditingActivity(undefined);
+            }
+          }}
+          activity={editingActivity}
+          accounts={accounts}
+          onSubmit={editingActivity ? handleUpdate : handleCreate}
+        />
       </div>
 
       <ActivityList

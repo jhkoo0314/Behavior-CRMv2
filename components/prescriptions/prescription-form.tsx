@@ -33,7 +33,9 @@ import type { Account } from '@/types/database.types';
 import type { Contact } from '@/types/database.types';
 import type { Activity } from '@/types/database.types';
 import { getContacts } from '@/actions/contacts/get-contacts';
-import { getActivities } from '@/actions/activities/get-activities';
+import { getRecentActivities } from '@/actions/activities/get-recent-activities';
+import { Combobox, type ComboboxOption } from '@/components/ui/combobox';
+import { PRODUCTS } from '@/constants/products';
 
 const prescriptionFormSchema = z.object({
   account_id: z.string().min(1, '병원을 선택해주세요'),
@@ -90,17 +92,17 @@ export function PrescriptionForm({
     }
   }, [selectedAccountId]);
 
-  // 선택한 병원의 Activity 목록 로드
+  // 선택한 병원의 최근 30일 Activity 목록 로드
   useEffect(() => {
     if (selectedAccountId) {
       setLoadingActivities(true);
-      getActivities({ account_id: selectedAccountId, limit: 100 })
-        .then((result) => {
-          setActivities(result.data);
+      getRecentActivities({ account_id: selectedAccountId, limit: 50 })
+        .then((data) => {
+          setActivities(data);
           setLoadingActivities(false);
         })
         .catch((error) => {
-          console.error('활동 목록 로드 실패:', error);
+          console.error('최근 활동 목록 로드 실패:', error);
           setActivities([]);
           setLoadingActivities(false);
         });
@@ -108,6 +110,22 @@ export function PrescriptionForm({
       setActivities([]);
     }
   }, [selectedAccountId]);
+
+  // 제품명 Combobox 옵션
+  const productOptions: ComboboxOption[] = PRODUCTS.map((product) => ({
+    value: product.name,
+    label: product.name,
+    isRecent: false,
+  }));
+
+  // 관련 활동 Combobox 옵션
+  const activityOptions: ComboboxOption[] = activities.map((activity) => ({
+    value: activity.id,
+    label: `${new Date(activity.performed_at).toLocaleString('ko-KR')} - ${
+      activity.description?.substring(0, 30) || '설명 없음'
+    }${activity.description && activity.description.length > 30 ? '...' : ''}`,
+    isRecent: false,
+  }));
 
   // prescription_date를 date 형식으로 변환
   const formatDate = (dateString: string) => {
@@ -245,38 +263,29 @@ export function PrescriptionForm({
           name="related_activity_id"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>관련 활동</FormLabel>
-              <Select
-                onValueChange={(value) =>
-                  field.onChange(value === 'none' ? null : value)
-                }
-                value={field.value || 'none'}
-                disabled={loadingActivities || activities.length === 0}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue
-                      placeholder={
-                        loadingActivities
-                          ? '로딩 중...'
-                          : activities.length === 0
-                            ? '활동이 없습니다'
-                            : '관련 활동을 선택하세요 (선택사항)'
-                      }
-                    />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="none">없음</SelectItem>
-                  {activities.map((activity) => (
-                    <SelectItem key={activity.id} value={activity.id}>
-                      {new Date(activity.performed_at).toLocaleString('ko-KR')} -{' '}
-                      {activity.description.substring(0, 50)}
-                      {activity.description.length > 50 ? '...' : ''}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <FormLabel>관련 활동 (최근 30일)</FormLabel>
+              <FormControl>
+                <Combobox
+                  options={[
+                    { value: 'none', label: '없음', isRecent: false },
+                    ...activityOptions,
+                  ]}
+                  value={field.value || 'none'}
+                  onValueChange={(value) =>
+                    field.onChange(value === 'none' ? null : value)
+                  }
+                  placeholder={
+                    loadingActivities
+                      ? '로딩 중...'
+                      : activities.length === 0
+                        ? '활동이 없습니다'
+                        : '관련 활동을 검색하세요 (선택사항)'
+                  }
+                  searchPlaceholder="활동을 검색하세요..."
+                  emptyText="활동을 찾을 수 없습니다."
+                  disabled={loadingActivities || activities.length === 0}
+                />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
@@ -290,7 +299,14 @@ export function PrescriptionForm({
               <FormItem>
                 <FormLabel>제품명 *</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="제품명을 입력하세요" />
+                  <Combobox
+                    options={productOptions}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    placeholder="제품명을 검색하세요..."
+                    searchPlaceholder="제품명으로 검색..."
+                    emptyText="제품을 찾을 수 없습니다."
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

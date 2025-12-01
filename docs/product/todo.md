@@ -12,6 +12,7 @@
 4. [스프린트 4: 분석 대시보드](#스프린트-4-분석-대시보드)
 5. [스프린트 5: Growth Map + AI 추천](#스프린트-5-growth-map--ai-추천)
 6. [스프린트 6: QA 및 파이롯 운영](#스프린트-6-qa-및-파이롯-운영)
+7. [스프린트 7: 사용자 입력 시스템 개선 (PRD 기반)](#스프린트-7-사용자-입력-시스템-개선-prd-기반)
 
 ---
 
@@ -782,6 +783,279 @@
 
 ---
 
+## 스프린트 7: 사용자 입력 시스템 개선 (PRD 기반)
+
+**목표**: PRD(`docs/product/input-prd.md`) 요구사항에 맞춰 영업사원의 현장 데이터 입력 경험을 개선
+
+**핵심 원칙**: "최소한의 터치로 최대한의 데이터를 남긴다"
+
+- Mobile First: 한 손 조작 가능
+- Speed: 30초 이내 입력 완료
+- Context Aware: 자동 입력 및 스마트 기본값
+- Immediate Feedback: Optimistic UI 및 Toast 알림
+
+### 7.1 필수 UI 컴포넌트 추가 ✅ **완료**
+
+#### 7.1.1 shadcn/ui 컴포넌트 설치 ✅ **완료**
+
+- [x] `components/ui/slider.tsx` 설치
+  - [x] shadcn CLI로 설치: `pnpx shadcn@latest add slider`
+  - [x] 품질/양적 점수 입력용 (0-100)
+- [x] `components/ui/radio-group.tsx` 설치
+  - [x] shadcn CLI로 설치: `pnpx shadcn@latest add radio-group`
+  - [x] 활동 유형 선택용 (Button 스타일)
+- [x] `components/ui/popover.tsx` 설치
+  - [x] shadcn CLI로 설치: `pnpx shadcn@latest add popover`
+  - [x] Combobox 구현용
+- [x] `components/ui/command.tsx` 설치
+  - [x] shadcn CLI로 설치: `pnpx shadcn@latest add command`
+  - [x] Combobox 검색 기능용
+- [x] `sonner` 패키지 설치
+  - [x] `pnpm add sonner`
+  - [x] Toast 알림 시스템용
+  - [x] `components/ui/sonner.tsx` 생성 (Toaster 컴포넌트)
+
+#### 7.1.2 공통 컴포넌트 구현 ✅ **완료**
+
+- [x] `components/ui/combobox.tsx` 생성
+  - [x] Popover + Command 조합
+  - [x] 검색 가능한 선택 컴포넌트
+  - [x] 최근 방문 항목 상단 노출 기능
+  - [x] Account(병원) 검색용으로 최적화
+- [ ] `components/ui/date-picker.tsx` 생성 (선택적)
+  - [ ] DatePicker 컴포넌트 (현재는 Input type="date" 사용 중)
+  - [ ] 향후 개선 시 사용
+
+### 7.2 Activity Form PRD 준수 개선 (P0 - 최우선) ✅ **완료**
+
+#### 7.2.1 Drawer (Bottom Sheet) 적용 ✅ **완료**
+
+- [x] `components/activities/activity-drawer.tsx` 생성
+  - [x] Sheet 컴포넌트를 `side="bottom"`으로 사용
+  - [x] 모바일에서 하단에서 올라오는 형태
+  - [x] Handle 바 추가 (드래그 가능)
+  - [x] 키보드 올라올 때 UI 깨짐 방지
+- [x] `components/activities/activity-form.tsx` 리팩토링
+  - [x] Drawer 내부에서 사용 가능하도록 수정
+  - [x] 기존 Dialog/Dialog 기반 구조 제거
+
+#### 7.2.2 UI 컴포넌트 교체 ✅ **완료**
+
+- [x] 병원 선택: Select → Combobox
+  - [x] 검색 기능 추가
+  - [x] 최근 방문 병원 상단 노출
+  - [x] `actions/accounts/get-recent-accounts.ts` 생성 (최근 방문 병원 조회)
+- [x] 활동 유형: Select → Radio Group (Button 스타일)
+  - [x] 방문, 전화, 메시지, PT, 후속관리
+  - [x] 한 줄에 배치 (모바일 최적화)
+- [x] 품질/양적 점수: Input (Number) → Slider
+  - [x] 0-100 범위 슬라이더
+  - [x] 기본값 50
+  - [x] 현재 값 표시 (예: "품질 점수: 75점")
+  - [x] 드래그로 빠른 조정 가능
+- [x] 소요 시간: Input 개선
+  - [x] Step 버튼 추가 (-10, +10)
+  - [x] 빠른 조정 가능
+
+#### 7.2.3 Step UI (2단계) 구현 ✅ **완료**
+
+- [x] Step 1: 기본 정보
+  - [x] 병원 선택 (Combobox)
+  - [x] 담당자 선택 (Select, 병원 선택 시 자동 필터링)
+  - [x] 활동 유형 (Radio Group)
+  - [x] 행동 목적 (Select)
+- [x] Step 2: 상세 정보
+  - [x] 품질 점수 (Slider)
+  - [x] 양적 점수 (Slider)
+  - [x] 내용 (Textarea, 선택사항)
+  - [x] 소요 시간 (Input with Step buttons)
+  - [x] 수행 일시 (Input type="datetime-local", 기본값: 현재 시간)
+- [x] Step 네비게이션
+  - [x] "다음" 버튼 (Step 1 → Step 2)
+  - [x] "이전" 버튼 (Step 2 → Step 1)
+  - [x] 진행 표시 (1/2, 2/2)
+
+#### 7.2.4 Smart Selection 로직 ✅ **완료**
+
+- [x] 활동 유형별 기본값 자동 설정
+  - [x] '방문' 선택 시: `duration_minutes` 기본값 30분
+  - [x] '전화' 선택 시: `duration_minutes` 기본값 5분
+  - [x] '메시지' 선택 시: `duration_minutes` 기본값 0분
+- [x] Context Aware 기본값
+  - [x] `performed_at`: 기본값 현재 시간
+  - [x] 최근 방문 병원 상단 노출
+  - [x] 병원 선택 시 해당 병원의 담당자 목록 자동 로드
+
+#### 7.2.5 Zod 스키마 수정 ✅ **완료**
+
+- [x] `description` 필드를 선택사항으로 변경
+  - [x] 현재: 필수 (`min(1)`)
+  - [x] 변경: 선택사항 (`.optional()`)
+- [x] 검증 규칙 PRD 준수 확인
+  - [x] `quality_score`, `quantity_score`: `.min(0).max(100)` ✅
+  - [x] `duration_minutes`: `.min(0)` ✅
+  - [x] `type`: ENUM 값 일치 확인 ✅
+
+### 7.3 Toast 알림 시스템 구현 ✅ **완료**
+
+#### 7.3.1 Toaster 설정 ✅ **완료**
+
+- [x] `app/layout.tsx`에 Toaster 추가
+  - [x] `components/ui/sonner.tsx` import
+  - [x] `<Toaster />` 컴포넌트 추가
+- [x] Toast 스타일 커스터마이징
+  - [x] 한국어 메시지
+  - [x] 모바일 최적화 (하단 표시, position="bottom-center")
+
+#### 7.3.2 Activity Form에 Toast 적용 ✅ **완료**
+
+- [x] 저장 성공 시
+  - [x] `toast.success("활동이 기록되었습니다")`
+  - [x] 폼 리셋 (`form.reset()`)
+  - [x] Drawer 닫기
+- [x] 저장 실패 시
+  - [x] `toast.error("저장에 실패했습니다")`
+  - [x] 에러 메시지 상세 표시
+- [x] 네트워크 오류 시
+  - [x] `toast.error("네트워크 오류가 발생했습니다")`
+  - [ ] 로컬 스토리지 임시 저장 고려 (향후)
+
+### 7.4 Prescription Form 개선 (P1) ✅ **완료**
+
+#### 7.4.1 제품명 입력 개선 ✅ **완료**
+
+- [x] 제품명: Input → Select/Combobox
+  - [x] 미리 정의된 제품 목록 사용
+  - [x] `constants/products.ts` 생성 (제품 목록 상수)
+  - [x] 검색 가능한 Combobox로 구현
+- [ ] 자동 계산 기능 (선택적)
+  - [ ] 수량 × 단가 = 총액 계산
+  - [ ] 실시간 업데이트
+
+#### 7.4.2 관련 활동 선택 개선 ✅ **완료**
+
+- [x] 최근 30일 활동 필터링
+  - [x] `actions/activities/get-recent-activities.ts` 생성
+  - [x] `account_id` 기준 최근 30일 활동만 조회
+  - [x] 날짜 + 설명 미리보기
+- [x] Combobox로 변경 (현재 Select)
+  - [x] 검색 가능
+  - [x] 활동 설명 미리보기
+
+### 7.5 경쟁사 신호 수동 입력 폼 (P2) ✅ **완료**
+
+#### 7.5.1 경쟁사 신호 입력 폼 생성 ✅ **완료**
+
+- [x] `components/competitor/competitor-signal-form.tsx` 생성
+  - [x] 대상 병원 (Combobox, 필수)
+  - [x] 경쟁사명 (Input, 필수)
+  - [x] 신호 유형 (Select, 필수)
+    - [x] 언급, 가격문의, 선호도변화 등
+  - [x] 상세 내용 (Textarea, 필수)
+- [x] `constants/competitor-signal-types.ts` 생성
+  - [x] 신호 유형 상수 정의
+  - [x] 라벨 매핑
+
+#### 7.5.2 경쟁사 신호 Server Action ✅ **완료**
+
+- [x] `actions/competitor-signals/create-competitor-signal.ts` 생성
+  - [x] 수동 입력 경쟁사 신호 저장
+  - [x] 자동 감지와 구분 (수동 입력 플래그)
+- [ ] `actions/competitor-signals/get-competitor-signals.ts` 수정
+  - [ ] 수동 입력 신호도 포함 (기존 함수가 이미 모든 신호를 조회하므로 수정 불필요)
+
+#### 7.5.3 경쟁사 신호 입력 UI ✅ **완료**
+
+- [ ] `app/(dashboard)/competitor-signals/page.tsx` 생성 (선택적)
+  - [ ] 경쟁사 신호 목록
+  - [ ] 수동 입력 버튼
+- [x] Drawer 형태로 입력 폼 표시
+  - [x] 빠른 입력 가능
+  - [x] 모바일 최적화 (폼 컴포넌트 완료, Drawer 통합은 선택적)
+
+### 7.6 모바일 최적화 ✅ **완료**
+
+#### 7.6.1 입력 폼 모바일 UX 개선 ✅ **완료**
+
+- [x] 키보드 올라올 때 UI 깨짐 방지
+  - [x] Drawer 높이 조정 (h-[90vh] max-h-[90vh])
+  - [x] 스크롤 가능하도록 설정 (overflow-y-auto)
+  - [x] pb-safe 클래스 추가
+- [x] 터치 인터랙션 최적화
+  - [x] 버튼 크기 최소 44px × 44px (min-h-[44px] min-w-[44px])
+  - [x] Slider 터치 영역 확대 (touch-manipulation, px-2)
+- [x] 한 손 조작 최적화
+  - [x] 주요 버튼 하단 배치
+  - [x] 저장 버튼 하단 고정 (pb-safe)
+
+#### 7.6.2 반응형 디자인 ✅ **완료**
+
+- [x] 데스크탑: Dialog 유지 (선택적) - 기존 Dialog는 제거하고 Drawer로 통일
+- [x] 모바일: Drawer (Bottom Sheet) 필수
+- [x] 화면 크기별 분기 처리
+  - [x] Drawer를 기본으로 사용 (모든 화면에서 일관된 UX)
+
+### 7.7 Optimistic UI 구현 ✅ **완료**
+
+#### 7.7.1 Activity 생성 Optimistic Update ✅ **완료**
+
+- [x] Activity 목록에 즉시 추가
+  - [x] 서버 응답 전 UI 업데이트 (임시 Activity 생성)
+  - [x] 실패 시 롤백 (임시 항목 제거, Drawer 다시 열기)
+- [ ] 대시보드 데이터 즉시 반영
+  - [ ] 캐시 무효화 대신 Optimistic Update
+  - [ ] 또는 캐시 무효화 + 즉시 재조회 (향후 구현)
+
+#### 7.7.2 로딩 상태 개선 ✅ **완료**
+
+- [x] 버튼 로딩 상태
+  - [x] `isSubmitting` 상태 표시
+  - [x] "저장 중..." 텍스트
+  - [x] 버튼 비활성화
+- [ ] Skeleton UI (선택적)
+  - [ ] 목록 업데이트 시 Skeleton 표시 (향후 구현)
+
+### 7.8 테스트 및 검증
+
+#### 7.8.1 모바일 테스트
+
+- [ ] 실제 모바일 기기에서 테스트
+  - [ ] iOS Safari
+  - [ ] Android Chrome
+- [ ] 입력 플로우 테스트
+  - [ ] Activity 입력 30초 이내 완료 가능한지 확인
+  - [ ] 한 손 조작 가능한지 확인
+  - [ ] 키보드 올라올 때 UI 깨짐 없는지 확인
+
+#### 7.8.2 사용성 테스트
+
+- [ ] 실제 영업사원 대상 테스트 (파이롯)
+- [ ] 피드백 수집
+- [ ] 개선 사항 반영
+
+### 7.9 문서화
+
+#### 7.9.1 사용자 가이드
+
+- [ ] Activity 입력 가이드 작성
+  - [ ] Step별 설명
+  - [ ] 각 필드 설명
+  - [ ] 팁 및 트릭
+- [ ] 모바일 사용 가이드
+  - [ ] 빠른 입력 방법
+  - [ ] 단축키/제스처 (있는 경우)
+
+#### 7.9.2 개발자 문서
+
+- [ ] 새로운 컴포넌트 사용법
+  - [ ] Combobox 사용 예시
+  - [ ] Drawer 사용 예시
+  - [ ] Toast 사용 예시
+- [ ] PRD 준수 체크리스트
+  - [ ] 각 폼이 PRD 요구사항 충족하는지 확인
+
+---
+
 ## 📝 참고사항
 
 ### 기술 스택
@@ -806,3 +1080,16 @@
 ### 다음 단계
 
 각 스프린트 완료 후 다음 스프린트로 진행하며, 필요시 이전 스프린트로 돌아가 수정/보완합니다.
+
+### 스프린트 7 관련 참고 문서
+
+- **PRD 문서**: `docs/product/input-prd.md`
+  - 사용자 입력 시스템 상세 요구사항
+  - UI/UX 가이드라인
+  - 기술 구현 명세
+- **현재 구현 상태**: 스프린트 2에서 기본 Activity Form 구현 완료
+- **개선 목표**: PRD 요구사항 100% 준수
+  - Mobile First 원칙
+  - 30초 이내 입력 완료
+  - Context Aware 자동 입력
+  - Immediate Feedback (Optimistic UI)
