@@ -18,5 +18,5 @@ afterEach(() => {
 });
 
 // 환경 변수 모킹
-process.env.NODE_ENV = 'test';
+(process.env as any).NODE_ENV = 'test';
 
