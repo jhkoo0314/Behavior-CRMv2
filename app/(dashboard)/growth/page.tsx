@@ -4,9 +4,26 @@
  * PRD 4.3 참고: 행동 품질 트렌드, Outcome Layer 변화, 성장 추천 액션
  */
 
-import { BehaviorTrendChart } from '@/components/growth/behavior-trend-chart';
-import { OutcomeTrendChart } from '@/components/growth/outcome-trend-chart';
-import { NextBestAction } from '@/components/recommendations/next-best-action';
+'use client';
+
+import dynamic from 'next/dynamic';
+import { Skeleton } from '@/components/ui/skeleton';
+
+// 차트 컴포넌트 동적 import (코드 스플리팅)
+const BehaviorTrendChart = dynamic(
+  () => import('@/components/growth/behavior-trend-chart').then((mod) => ({ default: mod.BehaviorTrendChart })),
+  { ssr: false, loading: () => <Skeleton className="h-[400px] w-full" /> }
+);
+
+const OutcomeTrendChart = dynamic(
+  () => import('@/components/growth/outcome-trend-chart').then((mod) => ({ default: mod.OutcomeTrendChart })),
+  { ssr: false, loading: () => <Skeleton className="h-[400px] w-full" /> }
+);
+
+const NextBestAction = dynamic(
+  () => import('@/components/recommendations/next-best-action').then((mod) => ({ default: mod.NextBestAction })),
+  { ssr: false, loading: () => <Skeleton className="h-[300px] w-full" /> }
+);
 
 export default function GrowthPage() {
   return (

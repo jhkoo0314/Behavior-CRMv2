@@ -30,14 +30,21 @@ import {
 import type { Account } from '@/types/database.types';
 
 const accountFormSchema = z.object({
-  name: z.string().min(1, '병원명을 입력해주세요'),
-  address: z.string().optional(),
-  phone: z.string().optional(),
+  name: z
+    .string()
+    .min(1, '병원명을 입력해주세요')
+    .max(200, '병원명은 200자 이하여야 합니다'),
+  address: z.string().max(500, '주소는 500자 이하여야 합니다').optional(),
+  phone: z
+    .string()
+    .regex(/^[0-9-]+$/, '전화번호는 숫자와 하이픈만 사용할 수 있습니다')
+    .max(20, '전화번호는 20자 이하여야 합니다')
+    .optional(),
   type: z.enum(['general_hospital', 'hospital', 'clinic', 'pharmacy']),
-  specialty: z.string().optional(),
-  patient_count: z.number().int().min(0).optional(),
-  revenue: z.number().int().min(0).optional(),
-  notes: z.string().optional(),
+  specialty: z.string().max(100, '진료과는 100자 이하여야 합니다').optional(),
+  patient_count: z.number().int().min(0).max(10000000).optional(),
+  revenue: z.number().int().min(0).max(1000000000000).optional(),
+  notes: z.string().max(2000, '메모는 2000자 이하여야 합니다').optional(),
 });
 
 export type AccountFormData = z.infer<typeof accountFormSchema>;

@@ -9,6 +9,7 @@
 import { auth } from '@clerk/nextjs/server';
 import { createClerkSupabaseClient } from '@/lib/supabase/server';
 import { getCurrentUserId } from '@/lib/supabase/get-user-id';
+import { logger } from '@/lib/utils/logger';
 import { calculateBehaviorScores } from '@/lib/analytics/calculate-behavior-scores';
 import type { BehaviorScoreResult } from '@/lib/analytics/calculate-behavior-scores';
 
@@ -23,8 +24,10 @@ export interface CalculateAndSaveInput {
 export async function calculateAndSaveBehaviorScores(
   input: CalculateAndSaveInput
 ): Promise<BehaviorScoreResult[]> {
-  console.group('calculateAndSaveBehaviorScores: 시작');
-  console.log('입력 데이터:', input);
+  const startTime = Date.now();
+  const actionName = 'calculateAndSaveBehaviorScores';
+
+  logger.action.start(actionName);
 
   try {
     const { userId } = await auth();
@@ -47,19 +50,32 @@ export async function calculateAndSaveBehaviorScores(
         ? input.periodEnd
         : new Date(input.periodEnd);
 
+    logger.debug('Behavior Score 계산 기간', {
+      period_start: periodStart.toISOString(),
+      period_end: periodEnd.toISOString(),
+    });
+
     // Behavior Score 계산
+    logger.info('Behavior Score 계산 시작');
     const scores = await calculateBehaviorScores(
       userUuid,
       periodStart,
       periodEnd
     );
 
-    console.log('계산된 점수:', scores);
+    logger.info('Behavior Score 계산 완료', {
+      score_count: scores.length,
+      behaviors: scores.map((s) => s.behaviorType),
+    });
 
     // Supabase에 저장
     const supabase = await createClerkSupabaseClient();
 
     // 기존 데이터 삭제 (중복 방지)
+    logger.db.query('DELETE FROM behavior_scores', {
+      user_id: userUuid,
+    });
+
     await supabase
       .from('behavior_scores')
       .delete()
@@ -78,22 +94,32 @@ export async function calculateAndSaveBehaviorScores(
       period_end: periodEnd.toISOString(),
     }));
 
+    logger.db.query('INSERT INTO behavior_scores', {
+      record_count: insertData.length,
+    });
+
     const { data, error } = await supabase
       .from('behavior_scores')
       .insert(insertData)
       .select();
 
     if (error) {
-      console.error('Behavior Score 저장 실패:', error);
+      logger.db.error('INSERT INTO behavior_scores', error as Error);
       throw new Error(`Failed to save behavior scores: ${error.message}`);
     }
 
-    console.log('저장 완료:', data);
-    console.groupEnd();
+    const duration = Date.now() - startTime;
+    logger.action.end(actionName, duration, {
+      saved_count: data?.length || 0,
+    });
+
     return scores;
   } catch (error) {
-    console.error('calculateAndSaveBehaviorScores 에러:', error);
-    console.groupEnd();
+    const duration = Date.now() - startTime;
+    const err = error instanceof Error ? error : new Error(String(error));
+    logger.action.error(actionName, err, {
+      duration: `${duration}ms`,
+    });
     throw error;
   }
 }

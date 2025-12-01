@@ -9,10 +9,24 @@
 'use client';
 
 import { Suspense } from 'react';
-import { BehaviorQualityChart } from '@/components/dashboard/behavior-quality-chart';
-import { OutcomeStatCards } from '@/components/dashboard/outcome-stat-cards';
-import { BehaviorOutcomeMap } from '@/components/dashboard/behavior-outcome-map';
+import dynamic from 'next/dynamic';
 import { Skeleton } from '@/components/ui/skeleton';
+
+// 차트 컴포넌트 동적 import (코드 스플리팅)
+const BehaviorQualityChart = dynamic(
+  () => import('@/components/dashboard/behavior-quality-chart').then((mod) => ({ default: mod.BehaviorQualityChart })),
+  { ssr: false, loading: () => <Skeleton className="h-[400px] w-full" /> }
+);
+
+const OutcomeStatCards = dynamic(
+  () => import('@/components/dashboard/outcome-stat-cards').then((mod) => ({ default: mod.OutcomeStatCards })),
+  { ssr: false, loading: () => <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"><Skeleton className="h-32 w-full" /><Skeleton className="h-32 w-full" /><Skeleton className="h-32 w-full" /><Skeleton className="h-32 w-full" /></div> }
+);
+
+const BehaviorOutcomeMap = dynamic(
+  () => import('@/components/dashboard/behavior-outcome-map').then((mod) => ({ default: mod.BehaviorOutcomeMap })),
+  { ssr: false, loading: () => <Skeleton className="h-[400px] w-full" /> }
+);
 
 function DashboardSkeleton() {
   return (

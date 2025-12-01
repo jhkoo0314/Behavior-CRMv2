@@ -10,6 +10,7 @@
 import { auth } from '@clerk/nextjs/server';
 import { createClerkSupabaseClient } from '@/lib/supabase/server';
 import { getCurrentUserId } from '@/lib/supabase/get-user-id';
+import { logger } from '@/lib/utils/logger';
 import type { AnalyticsCache } from '@/types/database.types';
 
 export interface GetCachedAnalyticsInput {
@@ -50,9 +51,10 @@ export async function getCachedAnalytics(
     if (error) {
       // 캐시가 없는 경우
       if (error.code === 'PGRST116') {
+        logger.debug('캐시 없음', { cache_key: input.cacheKey });
         return null;
       }
-      console.error('캐시 조회 실패:', error);
+      logger.error('캐시 조회 실패', error as Error, { cache_key: input.cacheKey });
       throw new Error(`Failed to get cached analytics: ${error.message}`);
     }
 
@@ -67,7 +69,7 @@ export async function getCachedAnalytics(
     const now = new Date();
 
     if (now > expiresAt) {
-      console.log('캐시가 만료되었습니다:', cache.cache_key);
+      logger.info('캐시 만료', { cache_key: cache.cache_key });
       // 만료된 캐시는 삭제
       await supabase
         .from('analytics_cache')
@@ -76,7 +78,7 @@ export async function getCachedAnalytics(
       return null;
     }
 
-    console.log('캐시 조회 성공:', cache.cache_key);
+    logger.debug('캐시 조회 성공', { cache_key: cache.cache_key });
     return cache;
   } catch (error) {
     console.error('getCachedAnalytics 에러:', error);

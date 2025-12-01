@@ -63,7 +63,26 @@ const activityFormSchema = z.object({
     'demonstration',
     'follow_up',
   ] as const),
-  description: z.string().min(1, '설명을 입력해주세요'),
+  description: z
+    .string()
+    .min(1, '설명을 입력해주세요')
+    .max(5000, '설명은 5000자 이하여야 합니다')
+    .refine(
+      (val) => {
+        // XSS 방지: 위험한 태그나 스크립트 패턴 검사
+        const dangerousPatterns = [
+          /<script/i,
+          /javascript:/i,
+          /onerror=/i,
+          /onload=/i,
+          /onclick=/i,
+        ];
+        return !dangerousPatterns.some((pattern) => pattern.test(val));
+      },
+      {
+        message: '위험한 내용이 포함되어 있습니다',
+      }
+    ),
   quality_score: z.number().int().min(0).max(100),
   quantity_score: z.number().int().min(0).max(100),
   duration_minutes: z.number().int().min(0).optional(),

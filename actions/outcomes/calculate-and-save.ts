@@ -9,6 +9,8 @@
 import { auth } from '@clerk/nextjs/server';
 import { createClerkSupabaseClient } from '@/lib/supabase/server';
 import { getCurrentUserId } from '@/lib/supabase/get-user-id';
+import { logger } from '@/lib/utils/logger';
+import { invalidateOutcomeCache } from '@/lib/utils/cache-invalidation';
 import { calculateHIR } from '@/lib/analytics/calculate-hir';
 import { calculateConversionRate } from '@/lib/analytics/calculate-conversion-rate';
 import { calculateFieldGrowth } from '@/lib/analytics/calculate-field-growth';
@@ -29,8 +31,13 @@ export interface CalculateAndSaveOutcomeInput {
 export async function calculateAndSaveOutcome(
   input: CalculateAndSaveOutcomeInput
 ): Promise<Outcome> {
-  console.group('calculateAndSaveOutcome: 시작');
-  console.log('입력 데이터:', input);
+  const startTime = Date.now();
+  const actionName = 'calculateAndSaveOutcome';
+
+  logger.action.start(actionName, {
+    period_type: input.periodType,
+    account_id: input.accountId,
+  });
 
   try {
     const { userId } = await auth();
@@ -53,29 +60,32 @@ export async function calculateAndSaveOutcome(
         ? input.periodEnd
         : new Date(input.periodEnd);
 
-    console.log('기간:', periodStart, '~', periodEnd);
-    console.log('기간 타입:', input.periodType);
+    logger.debug('Outcome 계산 기간', {
+      period_start: periodStart.toISOString(),
+      period_end: periodEnd.toISOString(),
+      period_type: input.periodType,
+    });
 
     // 4개 지표 각각 계산
-    console.log('HIR 계산 시작...');
+    logger.info('HIR 계산 시작');
     const hirScore = await calculateHIR(
       userUuid,
       periodStart,
       periodEnd,
       input.accountId
     );
-    console.log('HIR 계산 완료:', hirScore);
+    logger.info('HIR 계산 완료', { hir_score: hirScore });
 
-    console.log('전환률 계산 시작...');
+    logger.info('전환률 계산 시작');
     const conversionRate = await calculateConversionRate(
       userUuid,
       periodStart,
       periodEnd,
       input.accountId
     );
-    console.log('전환률 계산 완료:', conversionRate);
+    logger.info('전환률 계산 완료', { conversion_rate: conversionRate });
 
-    console.log('필드 성장률 계산 시작...');
+    logger.info('필드 성장률 계산 시작');
     const fieldGrowthRate = await calculateFieldGrowth({
       userId: userUuid,
       periodStart,
@@ -83,21 +93,26 @@ export async function calculateAndSaveOutcome(
       comparisonPeriod: 'previous_month',
       accountId: input.accountId,
     });
-    console.log('필드 성장률 계산 완료:', fieldGrowthRate);
+    logger.info('필드 성장률 계산 완료', { field_growth_rate: fieldGrowthRate });
 
-    console.log('처방 기반 성과지수 계산 시작...');
+    logger.info('처방 기반 성과지수 계산 시작');
     const prescriptionIndex = await calculatePrescriptionIndex(
       userUuid,
       periodStart,
       periodEnd,
       input.accountId
     );
-    console.log('처방 기반 성과지수 계산 완료:', prescriptionIndex);
+    logger.info('처방 기반 성과지수 계산 완료', { prescription_index: prescriptionIndex });
 
     // Supabase에 저장
     const supabase = await createClerkSupabaseClient();
 
     // 기존 데이터 삭제 (중복 방지)
+    logger.db.query('DELETE FROM outcomes', {
+      user_id: userUuid,
+      period_type: input.periodType,
+    });
+
     let deleteQuery = supabase
       .from('outcomes')
       .delete()
@@ -127,7 +142,10 @@ export async function calculateAndSaveOutcome(
       period_end: periodEnd.toISOString(),
     };
 
-    console.log('저장할 데이터:', insertData);
+    logger.db.query('INSERT INTO outcomes', {
+      period_type: input.periodType,
+      account_id: input.accountId,
+    });
 
     const { data, error } = await supabase
       .from('outcomes')
@@ -136,16 +154,35 @@ export async function calculateAndSaveOutcome(
       .single();
 
     if (error) {
-      console.error('Outcome 저장 실패:', error);
+      logger.db.error('INSERT INTO outcomes', error as Error, {
+        period_type: input.periodType,
+      });
       throw new Error(`Failed to save outcome: ${error.message}`);
     }
 
-    console.log('저장 완료:', data);
-    console.groupEnd();
+    // 관련 캐시 무효화
+    try {
+      await invalidateOutcomeCache(userUuid, input.accountId);
+    } catch (cacheError) {
+      logger.warn('캐시 무효화 실패 (무시)', {
+        error: cacheError instanceof Error ? cacheError.message : String(cacheError),
+      });
+    }
+
+    const duration = Date.now() - startTime;
+    logger.action.end(actionName, duration, {
+      outcome_id: data.id,
+      hir_score: Math.round(hirScore),
+      conversion_rate: Math.round(conversionRate),
+    });
+
     return data as Outcome;
   } catch (error) {
-    console.error('calculateAndSaveOutcome 에러:', error);
-    console.groupEnd();
+    const duration = Date.now() - startTime;
+    const err = error instanceof Error ? error : new Error(String(error));
+    logger.action.error(actionName, err, {
+      duration: `${duration}ms`,
+    });
     throw error;
   }
 }

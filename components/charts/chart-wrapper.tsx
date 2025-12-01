@@ -14,6 +14,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlertCircle } from 'lucide-react';
+import { ChartErrorBoundary } from '@/components/error-boundary';
 
 interface ChartWrapperProps {
   title?: string;
@@ -109,17 +110,19 @@ export function ChartWrapper({
 
   // 정상 상태
   return (
-    <Card className={className}>
-      {title && (
-        <CardHeader>
-          <CardTitle>{title}</CardTitle>
-          {description && (
-            <p className="text-sm text-muted-foreground">{description}</p>
-          )}
-        </CardHeader>
-      )}
-      <CardContent>{children}</CardContent>
-    </Card>
+    <ChartErrorBoundary>
+      <Card className={className}>
+        {title && (
+          <CardHeader>
+            <CardTitle>{title}</CardTitle>
+            {description && (
+              <p className="text-sm text-muted-foreground">{description}</p>
+            )}
+          </CardHeader>
+        )}
+        <CardContent>{children}</CardContent>
+      </Card>
+    </ChartErrorBoundary>
   );
 }
 

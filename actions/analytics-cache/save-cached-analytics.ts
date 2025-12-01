@@ -10,6 +10,7 @@
 import { auth } from '@clerk/nextjs/server';
 import { createClerkSupabaseClient } from '@/lib/supabase/server';
 import { getCurrentUserId } from '@/lib/supabase/get-user-id';
+import { logger } from '@/lib/utils/logger';
 import type { AnalyticsCache } from '@/types/database.types';
 
 export interface SaveCachedAnalyticsInput {
@@ -46,10 +47,26 @@ export async function saveCachedAnalytics(
 
     const supabase = await createClerkSupabaseClient();
 
-    // TTL 계산 (기본 1시간)
-    const ttlHours = input.ttlHours || 1;
+    // TTL 계산 (캐시 타입에 따라 다르게 설정)
+    // 실시간 데이터: 5분, 일별 집계: 1시간, 주별/월별 집계: 24시간
+    let defaultTtlHours = 1; // 기본값: 1시간
+    if (input.cacheKey.includes('realtime') || input.cacheKey.includes('dashboard')) {
+      defaultTtlHours = 5 / 60; // 5분
+    } else if (input.cacheKey.includes('daily') || input.cacheKey.includes('day')) {
+      defaultTtlHours = 1; // 1시간
+    } else if (input.cacheKey.includes('weekly') || input.cacheKey.includes('monthly')) {
+      defaultTtlHours = 24; // 24시간
+    }
+
+    const ttlHours = input.ttlHours || defaultTtlHours;
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + ttlHours);
+
+    logger.debug('캐시 TTL 설정', {
+      cache_key: input.cacheKey,
+      ttl_hours: ttlHours,
+      expires_at: expiresAt.toISOString(),
+    });
 
     // 기존 캐시 삭제 (같은 키가 있으면)
     await supabase
@@ -76,9 +93,8 @@ export async function saveCachedAnalytics(
       expires_at: expiresAt.toISOString(),
     };
 
-    console.log('저장할 캐시 데이터:', {
+    logger.db.query('INSERT INTO analytics_cache', {
       cache_key: insertData.cache_key,
-      expires_at: insertData.expires_at,
     });
 
     const { data, error } = await supabase
@@ -88,12 +104,17 @@ export async function saveCachedAnalytics(
       .single();
 
     if (error) {
-      console.error('캐시 저장 실패:', error);
+      logger.db.error('INSERT INTO analytics_cache', error as Error, {
+        cache_key: input.cacheKey,
+      });
       throw new Error(`Failed to save cached analytics: ${error.message}`);
     }
 
-    console.log('캐시 저장 성공');
-    console.groupEnd();
+    logger.info('캐시 저장 성공', {
+      cache_key: input.cacheKey,
+      expires_at: expiresAt.toISOString(),
+    });
+
     return data as AnalyticsCache;
   } catch (error) {
     console.error('saveCachedAnalytics 에러:', error);

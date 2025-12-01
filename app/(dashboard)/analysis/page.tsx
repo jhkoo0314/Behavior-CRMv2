@@ -9,11 +9,29 @@
 'use client';
 
 import { Suspense } from 'react';
-import { HirGrowthScatter } from '@/components/analysis/hir-growth-scatter';
-import { CustomerSegmentation } from '@/components/analysis/customer-segmentation';
-import { VolumeQualityHeatmap } from '@/components/analysis/volume-quality-heatmap';
-import { PrescriptionFunnel } from '@/components/analysis/prescription-funnel';
+import dynamic from 'next/dynamic';
 import { Skeleton } from '@/components/ui/skeleton';
+
+// 차트 컴포넌트 동적 import (코드 스플리팅)
+const HirGrowthScatter = dynamic(
+  () => import('@/components/analysis/hir-growth-scatter').then((mod) => ({ default: mod.HirGrowthScatter })),
+  { ssr: false, loading: () => <Skeleton className="h-[400px] w-full" /> }
+);
+
+const CustomerSegmentation = dynamic(
+  () => import('@/components/analysis/customer-segmentation').then((mod) => ({ default: mod.CustomerSegmentation })),
+  { ssr: false, loading: () => <Skeleton className="h-[400px] w-full" /> }
+);
+
+const VolumeQualityHeatmap = dynamic(
+  () => import('@/components/analysis/volume-quality-heatmap').then((mod) => ({ default: mod.VolumeQualityHeatmap })),
+  { ssr: false, loading: () => <Skeleton className="h-[400px] w-full" /> }
+);
+
+const PrescriptionFunnel = dynamic(
+  () => import('@/components/analysis/prescription-funnel').then((mod) => ({ default: mod.PrescriptionFunnel })),
+  { ssr: false, loading: () => <Skeleton className="h-[400px] w-full" /> }
+);
 
 function AnalysisSkeleton() {
   return (
