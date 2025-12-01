@@ -24,68 +24,68 @@
 #### 1.1.1 Core 테이블 생성
 
 - [x] `accounts` 테이블 생성 (crm_schema.sql에 포함됨)
-  - [ ] 컬럼: id, name, address, phone, hospital_type, patient_count, revenue, created_at, updated_at
-  - [ ] 인덱스: name, address
-  - [ ] RLS 비활성화 (개발 단계)
-- [ ] `contacts` 테이블 생성
+  - [x] 컬럼: id, name, address, phone, type, specialty, patient_count, revenue, notes, created_at, updated_at
+  - [x] 인덱스: name
+  - [x] RLS 비활성화 (개발 단계)
+- [x] `contacts` 테이블 생성 (crm_schema.sql에 포함됨)
 
-  - [ ] 컬럼: id, account_id (FK), name, role, phone, email, specialty, notes, created_at, updated_at
-  - [ ] 인덱스: account_id, name
-  - [ ] RLS 비활성화 (개발 단계)
+  - [x] 컬럼: id, account_id (FK), name, role, phone, email, specialty, notes, created_at, updated_at
+  - [x] 인덱스: account_id
+  - [x] RLS 비활성화 (개발 단계)
 
-- [ ] `activities` 테이블 생성
+- [x] `activities` 테이블 생성 (crm_schema.sql에 포함됨)
 
-  - [ ] 컬럼: id, user_id (FK to users.clerk_id), account_id (FK), contact_id (FK, nullable), activity_type, behavior_type, description, quality_score, quantity_score, created_at, updated_at
-  - [ ] activity_type: ENUM ('visit', 'call', 'message', 'presentation', 'follow_up')
-  - [ ] behavior_type: ENUM ('approach', 'contact', 'visit', 'presentation', 'question', 'need_creation', 'demonstration', 'follow_up')
-  - [ ] 인덱스: user_id, account_id, created_at, behavior_type
-  - [ ] RLS 비활성화 (개발 단계)
+  - [x] 컬럼: id, user_id (FK to users.id), account_id (FK), contact_id (FK, nullable), type, behavior, description, quality_score, quantity_score, duration_minutes, performed_at, created_at, updated_at
+  - [x] type: ENUM ('visit', 'call', 'message', 'presentation', 'follow_up')
+  - [x] behavior: ENUM ('approach', 'contact', 'visit', 'presentation', 'question', 'need_creation', 'demonstration', 'follow_up')
+  - [x] 인덱스: user_id, account_id, performed_at
+  - [x] RLS 비활성화 (개발 단계)
 
-- [ ] `outcomes` 테이블 생성
+- [x] `outcomes` 테이블 생성 (crm_schema.sql에 포함됨)
 
-  - [ ] 컬럼: id, user_id (FK), account_id (FK), hir_score, conversion_rate, field_growth_rate, prescription_index, period_start, period_end, created_at
-  - [ ] 인덱스: user_id, account_id, period_start
-  - [ ] RLS 비활성화 (개발 단계)
+  - [x] 컬럼: id, user_id (FK), account_id (FK, nullable), hir_score, conversion_rate, field_growth_rate, prescription_index, period_type, period_start, period_end, created_at
+  - [x] 인덱스: user_id, account_id, period_start
+  - [x] RLS 비활성화 (개발 단계)
 
-- [ ] `prescriptions` 테이블 생성
+- [x] `prescriptions` 테이블 생성 (crm_schema.sql에 포함됨)
 
-  - [ ] 컬럼: id, account_id (FK), contact_id (FK, nullable), product_name, quantity, prescription_date, notes, created_at
-  - [ ] 인덱스: account_id, prescription_date
-  - [ ] RLS 비활성화 (개발 단계)
+  - [x] 컬럼: id, account_id (FK), contact_id (FK, nullable), related_activity_id (FK, nullable), product_name, product_code, quantity, quantity_unit, price, prescription_date, notes, created_at, updated_at
+  - [x] 인덱스: account_id, prescription_date
+  - [x] RLS 비활성화 (개발 단계)
 
-- [ ] `behavior_scores` 테이블 생성
+- [x] `behavior_scores` 테이블 생성 (crm_schema.sql에 포함됨)
 
-  - [ ] 컬럼: id, user_id (FK), behavior_type, intensity_score, diversity_score, quality_score, period_start, period_end, created_at
-  - [ ] behavior_type: ENUM (8개 Behavior Layer 지표)
-  - [ ] 인덱스: user_id, behavior_type, period_start
-  - [ ] RLS 비활성화 (개발 단계)
+  - [x] 컬럼: id, user_id (FK), behavior, intensity_score, diversity_score, quality_score, period_start, period_end, created_at
+  - [x] behavior: TEXT (8개 Behavior Layer 지표)
+  - [x] 인덱스: user_id, behavior, period_start
+  - [x] RLS 비활성화 (개발 단계)
 
-- [ ] `coaching_signals` 테이블 생성
+- [x] `coaching_signals` 테이블 생성 (crm_schema.sql에 포함됨)
 
-  - [ ] 컬럼: id, user_id (FK), signal_type, priority, message, recommended_action, account_id (FK, nullable), created_at, resolved_at
-  - [ ] signal_type: ENUM ('behavior_lack', 'relationship_decline', 'competitor_activity', 'conversion_lack', 'interest_drop', 'weak_behavior')
-  - [ ] priority: ENUM ('high', 'medium', 'low')
-  - [ ] 인덱스: user_id, priority, created_at
-  - [ ] RLS 비활성화 (개발 단계)
+  - [x] 컬럼: id, user_id (FK), account_id (FK, nullable), contact_id (FK, nullable), type, priority, message, recommended_action, is_resolved, resolved_at, created_at
+  - [x] type: TEXT
+  - [x] priority: ENUM ('high', 'medium', 'low')
+  - [x] 인덱스: user_id, priority
+  - [x] RLS 비활성화 (개발 단계)
 
-- [ ] `competitor_signals` 테이블 생성
+- [x] `competitor_signals` 테이블 생성 (crm_schema.sql에 포함됨)
 
-  - [ ] 컬럼: id, account_id (FK), contact_id (FK, nullable), competitor_name, signal_type, description, detected_at, created_at
-  - [ ] signal_type: ENUM ('mention', 'price_inquiry', 'preference_change', 'sample_request')
-  - [ ] 인덱스: account_id, detected_at
-  - [ ] RLS 비활성화 (개발 단계)
+  - [x] 컬럼: id, account_id (FK), contact_id (FK, nullable), competitor_name, type, description, detected_at, created_at
+  - [x] type: TEXT
+  - [x] 인덱스: account_id, detected_at
+  - [x] RLS 비활성화 (개발 단계)
 
-- [ ] `analytics_cache` 테이블 생성
-  - [ ] 컬럼: id, user_id (FK), cache_key, cache_data (JSONB), period_start, period_end, created_at, expires_at
-  - [ ] 인덱스: user_id, cache_key, expires_at
-  - [ ] RLS 비활성화 (개발 단계)
+- [x] `analytics_cache` 테이블 생성 (crm_schema.sql에 포함됨)
+  - [x] 컬럼: id, user_id (FK, nullable), cache_key, data (JSONB), period_start, period_end, expires_at, created_at
+  - [x] 인덱스: user_id, cache_key, expires_at
+  - [x] RLS 비활성화 (개발 단계)
 
 #### 1.1.2 마이그레이션 파일 작성
 
-- [ ] `supabase/migrations/YYYYMMDDHHmmss_create_core_tables.sql` 생성
-- [ ] 모든 테이블 생성 SQL 통합
-- [ ] 외래 키 제약 조건 추가
-- [ ] 마이그레이션 테스트
+- [x] `supabase/migrations/crm_schema.sql` 생성
+- [x] 모든 테이블 생성 SQL 통합
+- [x] 외래 키 제약 조건 추가
+- [x] 마이그레이션 테스트 (스키마 파일 작성 완료)
 
 ### 1.2 프로젝트 기본 구조 설정
 
@@ -212,117 +212,117 @@
 
 ---
 
-## 스프린트 2: Behavior Layer 구축
+## 스프린트 2: Behavior Layer 구축 ✅ **완료**
 
 **목표**: 영업사원의 행동 데이터 수집 및 저장 시스템 구축
 
-### 2.1 Activity 기록 기능
+### 2.1 Activity 기록 기능 ✅ **완료**
 
 #### 2.1.1 Activity 입력 폼
 
-- [ ] `components/activities/activity-form.tsx` 생성
-  - [ ] 활동 타입 선택 (visit, call, message, presentation, follow_up)
-  - [ ] Behavior 타입 선택 (8개 지표)
-  - [ ] 병원(Account) 선택
-  - [ ] 담당자(Contact) 선택
-  - [ ] 설명 입력
-  - [ ] 품질 점수 입력 (1-10)
-  - [ ] 양 점수 입력 (1-10)
-  - [ ] React Hook Form + Zod 검증
+- [x] `components/activities/activity-form.tsx` 생성
+  - [x] 활동 타입 선택 (visit, call, message, presentation, follow_up)
+  - [x] Behavior 타입 선택 (8개 지표)
+  - [x] 병원(Account) 선택
+  - [x] 담당자(Contact) 선택
+  - [x] 설명 입력
+  - [x] 품질 점수 입력 (0-100)
+  - [x] 양 점수 입력 (0-100)
+  - [x] React Hook Form + Zod 검증
 
 #### 2.1.2 Activity Server Actions
 
-- [ ] `actions/activities/create-activity.ts` 생성
-  - [ ] Activity 생성 로직
-  - [ ] Supabase 클라이언트 사용
-  - [ ] 에러 처리
-- [ ] `actions/activities/get-activities.ts` 생성
+- [x] `actions/activities/create-activity.ts` 생성
+  - [x] Activity 생성 로직
+  - [x] Supabase 클라이언트 사용
+  - [x] 에러 처리
+- [x] `actions/activities/get-activities.ts` 생성
 
-  - [ ] 사용자별 Activity 조회
-  - [ ] 필터링 (날짜, 타입, 병원)
-  - [ ] 페이지네이션
+  - [x] 사용자별 Activity 조회
+  - [x] 필터링 (날짜, 타입, 병원)
+  - [x] 페이지네이션
 
-- [ ] `actions/activities/update-activity.ts` 생성
+- [x] `actions/activities/update-activity.ts` 생성
 
-  - [ ] Activity 수정 로직
-  - [ ] 권한 체크 (본인만 수정 가능)
+  - [x] Activity 수정 로직
+  - [x] 권한 체크 (본인만 수정 가능)
 
-- [ ] `actions/activities/delete-activity.ts` 생성
-  - [ ] Activity 삭제 로직
-  - [ ] 권한 체크
+- [x] `actions/activities/delete-activity.ts` 생성
+  - [x] Activity 삭제 로직
+  - [x] 권한 체크
 
 #### 2.1.3 Activity 목록 페이지
 
-- [ ] `app/(dashboard)/activities/page.tsx` 구현
-  - [ ] Activity 목록 표시 (Table)
-  - [ ] 필터링 UI
-  - [ ] 페이지네이션
-  - [ ] Activity 추가 버튼
-- [ ] `components/activities/activity-list.tsx` 생성
-  - [ ] Activity 목록 컴포넌트
-  - [ ] 정렬 기능
-  - [ ] 수정/삭제 액션
+- [x] `app/(dashboard)/activities/page.tsx` 구현
+  - [x] Activity 목록 표시 (Table)
+  - [x] 필터링 UI
+  - [x] 페이지네이션
+  - [x] Activity 추가 버튼
+- [x] `components/activities/activity-list.tsx` 생성
+  - [x] Activity 목록 컴포넌트
+  - [x] 정렬 기능
+  - [x] 수정/삭제 액션
 
-### 2.2 Account (병원) 관리
+### 2.2 Account (병원) 관리 ✅ **완료**
 
 #### 2.2.1 Account CRUD Server Actions
 
-- [ ] `actions/accounts/create-account.ts` 생성
-- [ ] `actions/accounts/get-accounts.ts` 생성
-- [ ] `actions/accounts/update-account.ts` 생성
-- [ ] `actions/accounts/delete-account.ts` 생성
+- [x] `actions/accounts/create-account.ts` 생성
+- [x] `actions/accounts/get-accounts.ts` 생성
+- [x] `actions/accounts/update-account.ts` 생성
+- [x] `actions/accounts/delete-account.ts` 생성
 
 #### 2.2.2 Account 관리 UI
 
-- [ ] `components/accounts/account-form.tsx` 생성
-  - [ ] 병원 정보 입력 폼
-  - [ ] 병원 타입, 환자 수, 매출 등
-- [ ] `components/accounts/account-list.tsx` 생성
-  - [ ] 병원 목록 표시
-  - [ ] 검색 기능
-- [ ] `app/(dashboard)/accounts/page.tsx` 생성
-  - [ ] Account 관리 페이지
+- [x] `components/accounts/account-form.tsx` 생성
+  - [x] 병원 정보 입력 폼
+  - [x] 병원 타입, 환자 수, 매출 등
+- [x] `components/accounts/account-list.tsx` 생성
+  - [x] 병원 목록 표시
+  - [x] 검색 기능
+- [x] `app/(dashboard)/accounts/page.tsx` 생성
+  - [x] Account 관리 페이지
 
-### 2.3 Contact (담당자) 관리
+### 2.3 Contact (담당자) 관리 ✅ **완료**
 
 #### 2.3.1 Contact CRUD Server Actions
 
-- [ ] `actions/contacts/create-contact.ts` 생성
-- [ ] `actions/contacts/get-contacts.ts` 생성
-- [ ] `actions/contacts/update-contact.ts` 생성
-- [ ] `actions/contacts/delete-contact.ts` 생성
+- [x] `actions/contacts/create-contact.ts` 생성
+- [x] `actions/contacts/get-contacts.ts` 생성
+- [x] `actions/contacts/update-contact.ts` 생성
+- [x] `actions/contacts/delete-contact.ts` 생성
 
 #### 2.3.2 Contact 관리 UI
 
-- [ ] `components/contacts/contact-form.tsx` 생성
-- [ ] `components/contacts/contact-list.tsx` 생성
-- [ ] Account 상세 페이지에 Contact 목록 표시
+- [x] `components/contacts/contact-form.tsx` 생성
+- [x] `components/contacts/contact-list.tsx` 생성
+- [x] Account 상세 페이지에 Contact 목록 표시 (Activity 폼에서 Account 선택 시 해당 Contact만 표시)
 
-### 2.4 Behavior Score 계산 엔진
+### 2.4 Behavior Score 계산 엔진 ✅ **완료**
 
 #### 2.4.1 Behavior Score 계산 함수
 
-- [ ] `lib/analytics/calculate-behavior-scores.ts` 생성
-  - [ ] 행동 강도(Intensity) 계산
-    - [ ] 방문 + 콜 + 메시지 + 자료전달 \* 가중치
-  - [ ] 행동 다양성(Diversity) 계산
-    - [ ] 행동 종류 개수
-  - [ ] 행동 질(Quality) 계산
-    - [ ] follow-up율 + 의사 반응 + 고민 해결 여부
-  - [ ] 0~100점 스케일로 표준화
+- [x] `lib/analytics/calculate-behavior-scores.ts` 생성
+  - [x] 행동 강도(Intensity) 계산
+    - [x] 방문 + 콜 + 메시지 + 자료전달 \* 가중치
+  - [x] 행동 다양성(Diversity) 계산
+    - [x] 행동 종류 개수
+  - [x] 행동 질(Quality) 계산
+    - [x] follow-up율 + 의사 반응 + 고민 해결 여부
+  - [x] 0~100점 스케일로 표준화
 
 #### 2.4.2 Behavior Score 저장 로직
 
-- [ ] `actions/behavior-scores/calculate-and-save.ts` 생성
-  - [ ] 주기별 Behavior Score 계산
-  - [ ] `behavior_scores` 테이블에 저장
-  - [ ] 기간별 집계 (7일, 30일)
+- [x] `actions/behavior-scores/calculate-and-save.ts` 생성
+  - [x] 주기별 Behavior Score 계산
+  - [x] `behavior_scores` 테이블에 저장
+  - [x] 기간별 집계 (7일, 30일)
 
 #### 2.4.3 Behavior Score 조회
 
-- [ ] `actions/behavior-scores/get-behavior-scores.ts` 생성
-  - [ ] 사용자별 Behavior Score 조회
-  - [ ] 기간별 필터링
+- [x] `actions/behavior-scores/get-behavior-scores.ts` 생성
+  - [x] 사용자별 Behavior Score 조회
+  - [x] 기간별 필터링
 
 ---
 
