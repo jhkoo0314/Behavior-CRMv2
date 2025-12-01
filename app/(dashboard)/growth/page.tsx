@@ -2,10 +2,11 @@
  * 성장 맵 페이지
  * 
  * PRD 4.3 참고: 행동 품질 트렌드, Outcome Layer 변화, 성장 추천 액션
- * 현재는 UI 구조만 준비하고, 실제 차트는 스프린트 5에서 구현
  */
 
-import { ChartWrapper } from '@/components/charts/chart-wrapper';
+import { BehaviorTrendChart } from '@/components/growth/behavior-trend-chart';
+import { OutcomeTrendChart } from '@/components/growth/outcome-trend-chart';
+import { NextBestAction } from '@/components/recommendations/next-best-action';
 
 export default function GrowthPage() {
   return (
@@ -17,35 +18,14 @@ export default function GrowthPage() {
         </p>
       </div>
 
-      {/* 행동 품질 트렌드 차트 영역 (임시) */}
-      <ChartWrapper
-        title="행동 품질 트렌드"
-        description="8개 Behavior 지표별 트렌드 (7일, 30일, 90일)"
-        isEmpty={true}
-        emptyMessage="데이터가 없습니다. 활동을 기록하면 트렌드 차트가 표시됩니다."
-      >
-        {null}
-      </ChartWrapper>
+      {/* 행동 품질 트렌드 차트 */}
+      <BehaviorTrendChart />
 
-      {/* Outcome Layer 변화 차트 영역 (임시) */}
-      <ChartWrapper
-        title="Outcome Layer 변화"
-        description="HIR, 전환률, 성장률, 처방지수 트렌드"
-        isEmpty={true}
-        emptyMessage="데이터가 없습니다."
-      >
-        {null}
-      </ChartWrapper>
+      {/* Outcome Layer 변화 차트 */}
+      <OutcomeTrendChart />
 
-      {/* 성장 추천 액션 영역 (임시) */}
-      <ChartWrapper
-        title="성장 추천 액션"
-        description="AI 기반 개인 맞춤 성장 추천"
-        isEmpty={true}
-        emptyMessage="데이터가 없습니다. 활동을 기록하면 추천 액션이 표시됩니다."
-      >
-        {null}
-      </ChartWrapper>
+      {/* 성장 추천 액션 */}
+      <NextBestAction />
     </div>
   );
 }

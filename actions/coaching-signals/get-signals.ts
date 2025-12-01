@@ -4,17 +4,19 @@
  * Coaching Signals 조회 Server Action
  * 
  * 사용자별 또는 팀 전체의 코칭 신호를 조회합니다.
- * 스프린트 5에서 신호 생성 로직이 구현되면 실제 데이터를 사용합니다.
+ * - 일반 사용자: 자신의 신호만 조회 가능
+ * - 관리자: 팀 전체 신호 조회 가능
  */
 
 import { auth } from '@clerk/nextjs/server';
 import { createClerkSupabaseClient } from '@/lib/supabase/server';
 import { getCurrentUserId } from '@/lib/supabase/get-user-id';
-import { requireManager } from '@/lib/auth/check-role';
+import { checkAnyRole } from '@/lib/auth/check-role';
+import { USER_ROLES } from '@/constants/user-roles';
 import type { CoachingSignal } from '@/types/database.types';
 
 export interface GetCoachingSignalsInput {
-  userId?: string; // 특정 사용자만 조회 (없으면 팀 전체)
+  userId?: string; // 특정 사용자만 조회 (관리자만 사용 가능)
   priority?: 'high' | 'medium' | 'low';
   isResolved?: boolean;
   limit?: number;
@@ -25,15 +27,18 @@ export async function getCoachingSignals(
   input: GetCoachingSignalsInput = {}
 ): Promise<{ data: CoachingSignal[]; totalCount: number }> {
   try {
-    // 관리자 권한 확인
-    await requireManager();
-
     const { userId } = await auth();
     if (!userId) {
       throw new Error('Unauthorized');
     }
 
+    const userUuid = await getCurrentUserId();
+    if (!userUuid) {
+      throw new Error('User not found');
+    }
+
     const supabase = await createClerkSupabaseClient();
+    const isManager = await checkAnyRole([USER_ROLES.MANAGER, USER_ROLES.HEAD_MANAGER]);
 
     let query = supabase
       .from('coaching_signals')
@@ -41,9 +46,17 @@ export async function getCoachingSignals(
 
     // 사용자 필터링
     if (input.userId) {
-      const userUuid = await getCurrentUserId();
-      // TODO: input.userId를 UUID로 변환 필요
+      // 관리자만 다른 사용자의 신호 조회 가능
+      if (!isManager) {
+        throw new Error('Only managers can view other users\' signals');
+      }
       query = query.eq('user_id', input.userId);
+    } else {
+      // 일반 사용자는 자신의 신호만 조회
+      if (!isManager) {
+        query = query.eq('user_id', userUuid);
+      }
+      // 관리자는 팀 전체 조회 (필터 없음)
     }
 
     // 우선순위 필터링

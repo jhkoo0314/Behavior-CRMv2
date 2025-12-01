@@ -9,6 +9,7 @@
 import { auth } from '@clerk/nextjs/server';
 import { createClerkSupabaseClient } from '@/lib/supabase/server';
 import { getCurrentUserId } from '@/lib/supabase/get-user-id';
+import { detectAndSaveCompetitorSignal } from '@/actions/competitor-signals/detect-and-save';
 import type { Activity } from '@/types/database.types';
 import type { ActivityType } from '@/constants/activity-types';
 import type { BehaviorType } from '@/constants/behavior-types';
@@ -71,6 +72,20 @@ export async function createActivity(
     }
 
     console.log('Activity 생성 성공:', data);
+
+    // 경쟁사 신호 자동 감지 (에러 발생해도 Activity 생성은 성공 처리)
+    try {
+      await detectAndSaveCompetitorSignal({
+        activityDescription: input.description,
+        accountId: input.account_id,
+        contactId: input.contact_id,
+        activityId: data.id,
+      });
+    } catch (competitorError) {
+      console.error('경쟁사 신호 감지 중 에러 (무시):', competitorError);
+      // 경쟁사 신호 감지는 부가 기능이므로 에러가 발생해도 Activity 생성은 성공
+    }
+
     console.groupEnd();
     return data as Activity;
   } catch (error) {

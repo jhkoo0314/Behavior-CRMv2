@@ -529,109 +529,117 @@
 
 ---
 
-## 스프린트 5: Growth Map + AI 추천
+## 스프린트 5: Growth Map + AI 추천 ✅ **완료**
 
 **목표**: 개인 성장 맵 및 AI 기반 코칭 추천 시스템
 
-### 5.1 영업사원 개별 성장 맵
+### 5.1 영업사원 개별 성장 맵 ✅ **완료**
 
-#### 5.1.1 행동 품질 트렌드 차트
+#### 5.1.1 행동 품질 트렌드 차트 ✅ **완료**
 
-- [ ] `components/growth/behavior-trend-chart.tsx` 생성
-  - [ ] 라인 차트: 8개 Behavior 지표별 트렌드
-  - [ ] 기간 선택 (7일, 30일, 90일)
-  - [ ] 비교 모드 (이전 기간과 비교)
+- [x] `components/growth/behavior-trend-chart.tsx` 생성
+  - [x] 라인 차트: 8개 Behavior 지표별 트렌드
+  - [x] 기간 선택 (7일, 30일, 90일)
+  - [x] 비교 모드 (이전 기간과 비교)
+- [x] `actions/behavior-scores/get-behavior-scores-trend.ts` 생성
+  - [x] 기간별 Behavior Score를 일별/주별로 집계하여 반환
 
-#### 5.1.2 Outcome Layer 변화 차트
+#### 5.1.2 Outcome Layer 변화 차트 ✅ **완료**
 
-- [ ] `components/growth/outcome-trend-chart.tsx` 생성
-  - [ ] 라인 차트: HIR, 전환률, 성장률, 처방지수 트렌드
-  - [ ] 목표선 표시
+- [x] `components/growth/outcome-trend-chart.tsx` 생성
+  - [x] 라인 차트: HIR, 전환률, 성장률, 처방지수 트렌드
+  - [x] 목표선 표시 (평균값 기준)
   - [ ] 예측선 (향후)
 
-#### 5.1.3 성장 맵 페이지
+#### 5.1.3 성장 맵 페이지 ✅ **완료**
 
-- [ ] `app/(dashboard)/growth/page.tsx` 구현
-  - [ ] 모든 성장 차트 통합
-  - [ ] 개인 목표 설정 기능
-  - [ ] 성장 리포트 생성
+- [x] `app/(dashboard)/growth/page.tsx` 구현
+  - [x] 모든 성장 차트 통합
+  - [ ] 개인 목표 설정 기능 (향후 구현)
+  - [ ] 성장 리포트 생성 (향후 구현)
 
-### 5.2 AI 기반 코칭 추천
+### 5.2 AI 기반 코칭 추천 ✅ **완료**
 
-#### 5.2.1 코칭 신호 생성 로직
+#### 5.2.1 코칭 신호 생성 로직 ✅ **완료**
 
-- [ ] `lib/analytics/generate-coaching-signals.ts` 생성
-  - [ ] 행동 부족 경보 감지
-  - [ ] 관계 악화 경보 감지
-  - [ ] 경쟁사 등장 경보 감지
-  - [ ] 전환 행동 부족 경보 감지
-  - [ ] 병원 관심도 급하락 경보 감지
-  - [ ] 사원별 취약 행동 경보 감지
-  - [ ] 우선순위 계산 (High/Medium/Low)
+- [x] `lib/analytics/generate-coaching-signals.ts` 생성
+  - [x] 행동 부족 경보 감지
+  - [x] 관계 악화 경보 감지
+  - [x] 경쟁사 등장 경보 감지
+  - [x] 전환 행동 부족 경보 감지
+  - [x] 병원 관심도 급하락 경보 감지
+  - [x] 사원별 취약 행동 경보 감지
+  - [x] 우선순위 계산 (High/Medium/Low)
 
-#### 5.2.2 코칭 추천 액션 생성
+#### 5.2.2 코칭 추천 액션 생성 ✅ **완료**
 
-- [ ] `lib/analytics/generate-coaching-actions.ts` 생성
-  - [ ] 신호 타입별 추천 액션 생성
-  - [ ] 템플릿 기반 메시지 생성
-  - [ ] 개인화된 코칭 문구
+- [x] `lib/analytics/generate-coaching-actions.ts` 생성
+  - [x] 신호 타입별 추천 액션 생성
+  - [x] 템플릿 기반 메시지 생성
+  - [x] 개인화된 코칭 문구
 
-#### 5.2.3 코칭 신호 저장 및 조회
+#### 5.2.3 코칭 신호 저장 및 조회 ✅ **완료**
 
-- [ ] `actions/coaching-signals/generate-and-save.ts` 생성
-  - [ ] 주기별 코칭 신호 생성 (일별)
-  - [ ] `coaching_signals` 테이블에 저장
-- [ ] `actions/coaching-signals/get-signals.ts` 생성
-  - [ ] 사용자별 코칭 신호 조회
-  - [ ] 우선순위별 필터링
-  - [ ] 해결/미해결 필터링
+- [x] `actions/coaching-signals/generate-and-save.ts` 생성
+  - [x] 주기별 코칭 신호 생성 (일별)
+  - [x] `coaching_signals` 테이블에 저장
+- [x] `actions/coaching-signals/get-signals.ts` 수정
+  - [x] 사용자별 코칭 신호 조회 (일반 사용자도 자신의 신호 조회 가능)
+  - [x] 우선순위별 필터링
+  - [x] 해결/미해결 필터링
+- [x] `actions/coaching-signals/resolve-signal.ts` 생성
+  - [x] 코칭 신호 해결 처리
 
-#### 5.2.4 코칭 신호 UI
+#### 5.2.4 코칭 신호 UI ✅ **완료**
 
-- [ ] `components/coaching/coaching-signals-list.tsx` 생성
-  - [ ] 코칭 신호 목록 표시
-  - [ ] 우선순위별 색상 표시
-  - [ ] 추천 액션 표시
-  - [ ] 해결 처리 기능
+- [x] `components/coaching/coaching-signals-list.tsx` 생성
+  - [x] 코칭 신호 목록 표시
+  - [x] 우선순위별 색상 표시
+  - [x] 추천 액션 표시
+  - [x] 해결 처리 기능
 
-### 5.3 경쟁사 활동 자동 탐지
+### 5.3 경쟁사 활동 자동 탐지 ✅ **완료**
 
-#### 5.3.1 경쟁사 신호 감지 로직
+#### 5.3.1 경쟁사 신호 감지 로직 ✅ **완료**
 
-- [ ] `lib/analytics/detect-competitor-signals.ts` 생성
-  - [ ] Activity description에서 경쟁사 키워드 탐지
-  - [ ] 의사 멘트 패턴 분석
-  - [ ] 가격/샘플 관련 문의 감지
-  - [ ] 제품 선호도 변화 감지
+- [x] `lib/analytics/detect-competitor-signals.ts` 생성
+  - [x] Activity description에서 경쟁사 키워드 탐지
+  - [x] 의사 멘트 패턴 분석
+  - [x] 가격/샘플 관련 문의 감지
+  - [x] 제품 선호도 변화 감지
 
-#### 5.3.2 경쟁사 신호 저장
+#### 5.3.2 경쟁사 신호 저장 ✅ **완료**
 
-- [ ] `actions/competitor-signals/detect-and-save.ts` 생성
-  - [ ] Activity 생성 시 자동 감지
-  - [ ] `competitor_signals` 테이블에 저장
+- [x] `actions/competitor-signals/detect-and-save.ts` 생성
+  - [x] Activity 생성 시 자동 감지
+  - [x] `competitor_signals` 테이블에 저장
+- [x] `actions/activities/create-activity.ts` 수정
+  - [x] Activity 생성 후 경쟁사 신호 자동 감지
 
 #### 5.3.3 경쟁사 신호 UI
 
-- [ ] `components/competitor/competitor-signals-list.tsx` 생성
+- [ ] `components/competitor/competitor-signals-list.tsx` 생성 (선택적, 관리자 대시보드에 이미 존재)
   - [ ] 경쟁사 활동 목록 표시
   - [ ] 병원별 필터링
   - [ ] 위험도 표시
 
-### 5.4 Next Best Action 추천
+### 5.4 Next Best Action 추천 ✅ **완료**
 
-#### 5.4.1 다음 행동 추천 알고리즘
+#### 5.4.1 다음 행동 추천 알고리즘 ✅ **완료**
 
-- [ ] `lib/analytics/recommend-next-action.ts` 생성
-  - [ ] 병원별, 담당자별 추천 행동 계산
-  - [ ] Behavior-Outcome 상관관계 기반
-  - [ ] 최근 활동 패턴 분석
+- [x] `lib/analytics/recommend-next-action.ts` 생성
+  - [x] 병원별, 담당자별 추천 행동 계산
+  - [x] Behavior-Outcome 상관관계 기반
+  - [x] 최근 활동 패턴 분석
 
-#### 5.4.2 Next Best Action UI
+#### 5.4.2 Next Best Action UI ✅ **완료**
 
-- [ ] `components/recommendations/next-best-action.tsx` 생성
-  - [ ] 추천 행동 카드 표시
-  - [ ] 병원별 추천 목록
-  - [ ] 추천 이유 표시
+- [x] `components/recommendations/next-best-action.tsx` 생성
+  - [x] 추천 행동 카드 표시
+  - [x] 병원별 추천 목록
+  - [x] 추천 이유 표시
+- [x] `actions/recommendations/get-next-best-actions.ts` 생성
+- [x] Growth 페이지에 통합
 
 ---
 
