@@ -2,10 +2,30 @@
  * 분석 페이지
  * 
  * PRD 4.2 참고: HIR ↔ 성장률 상관도, 고객 세분화, 활동 볼륨 × 품질 Matrix, 처방 기반 성과 Funnel
- * 현재는 UI 구조만 준비하고, 실제 차트는 스프린트 4에서 구현
+ * 
+ * 모든 차트는 클라이언트 렌더링 기반으로 구현됩니다.
  */
 
-import { ChartWrapper } from '@/components/charts/chart-wrapper';
+'use client';
+
+import { Suspense } from 'react';
+import { HirGrowthScatter } from '@/components/analysis/hir-growth-scatter';
+import { CustomerSegmentation } from '@/components/analysis/customer-segmentation';
+import { VolumeQualityHeatmap } from '@/components/analysis/volume-quality-heatmap';
+import { PrescriptionFunnel } from '@/components/analysis/prescription-funnel';
+import { Skeleton } from '@/components/ui/skeleton';
+
+function AnalysisSkeleton() {
+  return (
+    <div className="space-y-6">
+      <Skeleton className="h-10 w-64" />
+      <Skeleton className="h-[400px] w-full" />
+      <Skeleton className="h-[400px] w-full" />
+      <Skeleton className="h-[400px] w-full" />
+      <Skeleton className="h-[400px] w-full" />
+    </div>
+  );
+}
 
 export default function AnalysisPage() {
   return (
@@ -17,45 +37,19 @@ export default function AnalysisPage() {
         </p>
       </div>
 
-      {/* HIR ↔ 성장률 상관도 차트 영역 (임시) */}
-      <ChartWrapper
-        title="HIR ↔ 성장률 상관도"
-        description="X축: HIR, Y축: 필드 성장률, 버블 크기: 전체 활동량"
-        isEmpty={true}
-        emptyMessage="데이터가 없습니다. 활동을 기록하면 상관도 차트가 표시됩니다."
-      >
-        {null}
-      </ChartWrapper>
+      <Suspense fallback={<AnalysisSkeleton />}>
+        {/* HIR ↔ 성장률 상관도 차트 */}
+        <HirGrowthScatter />
 
-      {/* 고객 세분화 및 HIR 비교 영역 (임시) */}
-      <ChartWrapper
-        title="고객 세분화 및 HIR 비교"
-        description="고객군별 행동 품질(HIR) 비교"
-        isEmpty={true}
-        emptyMessage="데이터가 없습니다."
-      >
-        {null}
-      </ChartWrapper>
+        {/* 고객 세분화 및 HIR 비교 */}
+        <CustomerSegmentation />
 
-      {/* 활동 볼륨 × 품질 Matrix 영역 (임시) */}
-      <ChartWrapper
-        title="활동 볼륨 × 품질 Matrix"
-        description="행동 프로파일 분류 (많이 하지만 품질 낮음 / 적게 하지만 품질 높음 등)"
-        isEmpty={true}
-        emptyMessage="데이터가 없습니다."
-      >
-        {null}
-      </ChartWrapper>
+        {/* 활동 볼륨 × 품질 Matrix */}
+        <VolumeQualityHeatmap />
 
-      {/* 처방 기반 성과 Funnel Chart 영역 (임시) */}
-      <ChartWrapper
-        title="처방 기반 성과 Funnel"
-        description="행동 → 고객 반응 → 처방량 변화 → 성과"
-        isEmpty={true}
-        emptyMessage="데이터가 없습니다."
-      >
-        {null}
-      </ChartWrapper>
+        {/* 처방 기반 성과 Funnel Chart */}
+        <PrescriptionFunnel />
+      </Suspense>
     </div>
   );
 }
