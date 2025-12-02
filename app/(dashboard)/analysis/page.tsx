@@ -47,7 +47,7 @@ function AnalysisSkeleton() {
 
 export default function AnalysisPage() {
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 w-full space-y-6">
       <div>
         <h1 className="text-3xl font-bold">분석</h1>
         <p className="text-muted-foreground">

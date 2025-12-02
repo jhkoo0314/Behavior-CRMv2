@@ -17,6 +17,7 @@ export interface UpdateActivityInput {
   id: string;
   account_id?: string;
   contact_id?: string | null;
+  // 기존 필드 (하위 호환성)
   type?: ActivityType;
   behavior?: BehaviorType;
   description?: string;
@@ -24,6 +25,12 @@ export interface UpdateActivityInput {
   quantity_score?: number;
   duration_minutes?: number;
   performed_at?: Date | string;
+  // 새 필드 (Behavior-Driven Activity Form)
+  outcome?: 'won' | 'ongoing' | 'lost';
+  tags?: string[]; // 태그 배열
+  sentiment_score?: number; // 관계 온도 (0-100)
+  next_action_date?: Date | string; // 다음 활동 예정일
+  dwell_time_seconds?: number; // HIR 측정용 체류 시간 (초)
 }
 
 export async function updateActivity(
@@ -65,7 +72,7 @@ export async function updateActivity(
     console.log('수정 전 데이터:', existing);
 
     // 업데이트할 필드만 추출
-    const updateData: Partial<Activity> = {};
+    const updateData: Record<string, unknown> = {};
     if (input.account_id !== undefined) updateData.account_id = input.account_id;
     if (input.contact_id !== undefined)
       updateData.contact_id = input.contact_id || null;
@@ -85,6 +92,17 @@ export async function updateActivity(
           ? input.performed_at.toISOString()
           : input.performed_at;
     }
+    // 새 필드
+    if (input.outcome !== undefined) updateData.outcome = input.outcome;
+    if (input.tags !== undefined) updateData.tags = input.tags;
+    if (input.sentiment_score !== undefined) updateData.sentiment_score = input.sentiment_score;
+    if (input.next_action_date !== undefined) {
+      updateData.next_action_date =
+        input.next_action_date instanceof Date
+          ? input.next_action_date.toISOString().split('T')[0]
+          : new Date(input.next_action_date).toISOString().split('T')[0];
+    }
+    if (input.dwell_time_seconds !== undefined) updateData.dwell_time_seconds = input.dwell_time_seconds;
 
     const { data, error } = await supabase
       .from('activities')

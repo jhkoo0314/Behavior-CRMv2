@@ -18,7 +18,7 @@ export default async function ManagerPage() {
   await requireAnyRole([USER_ROLES.MANAGER, USER_ROLES.HEAD_MANAGER]);
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 w-full space-y-6">
       <div>
         <h1 className="text-3xl font-bold">관리자 대시보드</h1>
         <p className="text-muted-foreground">

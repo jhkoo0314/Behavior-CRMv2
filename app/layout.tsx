@@ -3,7 +3,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { koKR } from "@clerk/localizations";
 import { Geist, Geist_Mono } from "next/font/google";
 
-import Navbar from "@/components/Navbar";
+import { NavbarWrapper } from "@/components/layout/navbar-wrapper";
 import { SyncUserProvider } from "@/components/providers/sync-user-provider";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
@@ -35,7 +35,7 @@ export default function RootLayout({
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
           <SyncUserProvider>
-            <Navbar />
+            <NavbarWrapper />
             {children}
             <Toaster />
           </SyncUserProvider>

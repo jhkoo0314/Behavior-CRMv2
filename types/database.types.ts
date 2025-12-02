@@ -67,6 +67,12 @@ export interface Activity {
   quantity_score: number; // 0-100
   duration_minutes: number;
   performed_at: string;
+  // 새 필드 (Behavior-Driven Activity Form)
+  outcome: 'won' | 'ongoing' | 'lost' | null; // 활동 결과
+  tags: string[]; // 핵심 내용 태그 배열 (JSONB)
+  sentiment_score: number | null; // 관계 온도 (0-100)
+  next_action_date: string | null; // 다음 활동 예정일 (DATE)
+  dwell_time_seconds: number | null; // HIR 측정용 체류 시간 (초)
   created_at: string;
   updated_at: string;
 }
@@ -166,4 +172,6 @@ export interface AnalyticsCache {
   expires_at: string;
   created_at: string;
 }
+
+
 

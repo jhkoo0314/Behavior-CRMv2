@@ -20,9 +20,9 @@ export function AppLayout({ children }: AppLayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen">
       {/* 데스크탑 사이드바 */}
-      <aside className="hidden lg:block">
+      <aside className="hidden lg:block lg:flex-shrink-0">
         <Sidebar />
       </aside>
 
@@ -34,9 +34,9 @@ export function AppLayout({ children }: AppLayoutProps) {
       </Sheet>
 
       {/* 메인 콘텐츠 영역 */}
-      <div className="flex flex-1 flex-col overflow-hidden">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <Header onMenuClick={() => setMobileMenuOpen(true)} />
-        <main className="flex-1 overflow-y-auto bg-muted/30 p-6">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden bg-muted/30 p-4 lg:p-4 xl:p-6">
           {children}
         </main>
       </div>

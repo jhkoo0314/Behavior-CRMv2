@@ -47,23 +47,31 @@ export function ActivitiesClient({
     accountId: 'all',
   });
 
-  const handleCreate = async (data: ActivityFormData) => {
+  const handleCreate = async (
+    data: ActivityFormData & { dwell_time_seconds: number }
+  ) => {
     console.group('ActivitiesPage: Activity 생성');
-    
+    console.log('폼 데이터:', data);
+
     // Optimistic Update: 임시 Activity 생성
     const tempId = `temp-${Date.now()}`;
     const tempActivity: Activity = {
       id: tempId,
       user_id: '', // 임시 값
       account_id: data.account_id,
-      contact_id: data.contact_id,
-      type: data.type,
-      behavior: data.behavior,
+      contact_id: null, // 새 폼에서는 contact_id 사용 안 함
+      type: 'visit', // 기본값 (하위 호환성)
+      behavior: 'visit', // 기본값 (하위 호환성)
       description: data.description || '',
-      quality_score: data.quality_score,
-      quantity_score: data.quantity_score,
-      duration_minutes: data.duration_minutes || null,
+      quality_score: 0, // 기본값 (하위 호환성)
+      quantity_score: 0, // 기본값 (하위 호환성)
+      duration_minutes: 0, // 기본값
       performed_at: new Date(data.performed_at).toISOString(),
+      outcome: data.outcome,
+      tags: data.tags,
+      sentiment_score: data.sentiment_score,
+      next_action_date: data.next_action_date || null,
+      dwell_time_seconds: data.dwell_time_seconds,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
@@ -76,14 +84,13 @@ export function ActivitiesClient({
       // 실제 서버 요청
       const newActivity = await createActivity({
         account_id: data.account_id,
-        contact_id: data.contact_id ?? null,
-        type: data.type,
-        behavior: data.behavior,
-        description: data.description,
-        quality_score: data.quality_score,
-        quantity_score: data.quantity_score,
-        duration_minutes: data.duration_minutes,
+        outcome: data.outcome,
         performed_at: new Date(data.performed_at).toISOString(),
+        tags: data.tags,
+        sentiment_score: data.sentiment_score,
+        next_action_date: data.next_action_date,
+        description: data.description,
+        dwell_time_seconds: data.dwell_time_seconds,
       });
 
       // 임시 항목을 실제 항목으로 교체
@@ -102,21 +109,24 @@ export function ActivitiesClient({
     console.groupEnd();
   };
 
-  const handleUpdate = async (data: ActivityFormData) => {
+  const handleUpdate = async (
+    data: ActivityFormData & { dwell_time_seconds: number }
+  ) => {
     if (!editingActivity) return;
 
     console.group('ActivitiesPage: Activity 수정');
+    console.log('폼 데이터:', data);
+
     const updatedActivity = await updateActivity({
       id: editingActivity.id,
       account_id: data.account_id,
-      contact_id: data.contact_id ?? null,
-      type: data.type,
-      behavior: data.behavior,
-      description: data.description,
-      quality_score: data.quality_score,
-      quantity_score: data.quantity_score,
-      duration_minutes: data.duration_minutes,
+      outcome: data.outcome,
       performed_at: new Date(data.performed_at).toISOString(),
+      tags: data.tags,
+      sentiment_score: data.sentiment_score,
+      next_action_date: data.next_action_date,
+      description: data.description,
+      dwell_time_seconds: data.dwell_time_seconds,
     });
     setActivities((prev) =>
       prev.map((act) =>

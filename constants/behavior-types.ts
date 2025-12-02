@@ -29,3 +29,5 @@ export const BEHAVIOR_TYPE_LABELS: Record<BehaviorType, string> = {
 
 export const BEHAVIOR_TYPE_LIST = Object.values(BEHAVIOR_TYPES);
 
+
+

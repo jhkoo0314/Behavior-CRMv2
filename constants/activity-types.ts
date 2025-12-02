@@ -23,3 +23,5 @@ export const ACTIVITY_TYPE_LABELS: Record<ActivityType, string> = {
 
 export const ACTIVITY_TYPE_LIST = Object.values(ACTIVITY_TYPES);
 
+
+

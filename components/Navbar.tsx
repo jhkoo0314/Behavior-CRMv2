@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * @file components/Navbar.tsx
  * @description Behavior CRM 헤더 컴포넌트
@@ -8,25 +10,25 @@
  * 2. 사용자 프로필 정보 표시 (인증된 경우)
  *
  * 핵심 구현 로직:
- * - Server Component로 구현하여 서버에서 사용자 정보 조회
- * - 인증되지 않은 사용자도 접근 가능 (프로필만 숨김)
- * - Supabase에서 사용자 정보 조회
+ * - 클라이언트 컴포넌트로 구현하여 경로 확인 및 조건부 렌더링
+ * - Clerk useUser 훅으로 사용자 정보 조회
+ * - 대시보드 경로에서는 자동으로 숨김
  *
  * @dependencies
- * - @clerk/nextjs/server: 인증 확인
- * - @/lib/supabase/server: Supabase 클라이언트
- * - @/lib/supabase/get-user-id: 사용자 ID 조회
+ * - @clerk/nextjs: useUser 훅
+ * - @/lib/supabase/clerk-client: Supabase 클라이언트
  */
 
-import { auth, clerkClient } from "@clerk/nextjs/server";
-import Link from "next/link";
-import { createClerkSupabaseClient } from "@/lib/supabase/server";
-import { getCurrentUserId } from "@/lib/supabase/get-user-id";
-import { UserProfile } from "@/components/UserProfile";
+import { useUser } from '@clerk/nextjs';
+import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { useClerkSupabaseClient } from '@/lib/supabase/clerk-client';
+import { UserProfile } from '@/components/UserProfile';
 
 // 사용자 이니셜 생성 함수
 function getInitials(name: string): string {
-  if (!name) return "U";
+  if (!name) return 'U';
   const parts = name.trim().split(/\s+/);
   if (parts.length >= 2) {
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
@@ -34,50 +36,59 @@ function getInitials(name: string): string {
   return name.substring(0, 2).toUpperCase();
 }
 
-export default async function Navbar() {
-  // 인증 확인
-  const { userId } = await auth();
+export default function Navbar() {
+  const { user, isLoaded } = useUser();
+  const pathname = usePathname();
+  const supabase = useClerkSupabaseClient();
+  const [department, setDepartment] = useState<string>('영업팀');
 
-  let userName: string | null = null;
-  let userInitials = "U";
-  let userImageUrl: string | null = null;
-  let department = "영업팀";
+  // 대시보드 관련 경로에서는 Navbar 숨김
+  const isDashboardRoute =
+    pathname?.startsWith('/dashboard') ||
+    pathname?.startsWith('/accounts') ||
+    pathname?.startsWith('/activities') ||
+    pathname?.startsWith('/analysis') ||
+    pathname?.startsWith('/feedback') ||
+    pathname?.startsWith('/growth') ||
+    pathname?.startsWith('/manager') ||
+    pathname?.startsWith('/outcomes');
 
-  // 인증된 사용자인 경우에만 사용자 정보 가져오기
-  if (userId) {
-    // Clerk에서 사용자 정보 가져오기
-    const client = await clerkClient();
-    const clerkUser = await client.users.getUser(userId);
+  // 부서 정보 가져오기
+  useEffect(() => {
+    if (!isLoaded || !user) return;
 
-    if (clerkUser) {
-      // 이름 가져오기
-      userName =
-        clerkUser.fullName ||
-        [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(" ") ||
-        null;
-      userInitials = getInitials(userName || "사용자");
-      
-      // 프로필 이미지 가져오기
-      userImageUrl = clerkUser.imageUrl || null;
-
-      // 부서 정보는 Supabase에서 가져오기
-      const userUuid = await getCurrentUserId();
-      if (userUuid) {
-        const supabase = await createClerkSupabaseClient();
-        const { data: user } = await supabase
-          .from("users")
-          .select("role, team_id")
-          .eq("id", userUuid)
+    const fetchDepartment = async () => {
+      try {
+        const { data: userData } = await supabase
+          .from('users')
+          .select('role, team_id')
+          .eq('clerk_id', user.id)
           .single();
 
-        if (user) {
-          if (user.role === "manager" || user.role === "head_manager") {
-            department = "관리팀";
+        if (userData) {
+          if (userData.role === 'manager' || userData.role === 'head_manager') {
+            setDepartment('관리팀');
           }
         }
+      } catch (error) {
+        console.error('부서 정보 조회 실패:', error);
       }
-    }
+    };
+
+    fetchDepartment();
+  }, [isLoaded, user, supabase]);
+
+  // 대시보드 경로에서는 렌더링하지 않음
+  if (isDashboardRoute) {
+    return null;
   }
+
+  const userName =
+    user?.fullName ||
+    [user?.firstName, user?.lastName].filter(Boolean).join(' ') ||
+    null;
+  const userInitials = getInitials(userName || '사용자');
+  const userImageUrl = user?.imageUrl || null;
 
   return (
     <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -96,7 +107,7 @@ export default async function Navbar() {
       </div>
 
       {/* 사용자 프로필 (인증된 경우에만 표시) */}
-      {userName && (
+      {isLoaded && userName && (
         <UserProfile
           userName={userName}
           userInitials={userInitials}

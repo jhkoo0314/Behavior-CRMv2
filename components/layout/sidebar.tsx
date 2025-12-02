@@ -68,12 +68,12 @@ interface SidebarProps {
 
 export function Sidebar({ className }: SidebarProps) {
   const pathname = usePathname();
-  const [userRole, setUserRole] = useState<UserRole | null>(null);
+  // 초기 상태를 서버와 클라이언트에서 동일하게 유지
+  const [userRole] = useState<UserRole | null>(USER_ROLES.SALESPERSON);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    // 클라이언트에서 역할 조회 (서버 액션 필요)
-    // 임시로 모든 메뉴 표시
-    setUserRole(USER_ROLES.SALESPERSON);
+    setIsMounted(true);
   }, []);
 
   const filteredNavItems = navItems.filter((item) => {
@@ -90,19 +90,25 @@ export function Sidebar({ className }: SidebarProps) {
       )}
     >
       <div className="flex h-16 items-center border-b px-6">
-        <Link href="/dashboard" className="text-lg font-semibold">
+        <Link 
+          href="/dashboard" 
+          className="text-lg font-semibold"
+          prefetch={false}
+        >
           Behavior CRM
         </Link>
       </div>
       <nav className="flex-1 space-y-1 p-4">
         {filteredNavItems.map((item) => {
           const Icon = item.icon;
-          const isActive = pathname === item.href || pathname?.startsWith(`${item.href}/`);
+          // pathname은 클라이언트에서만 사용 가능하므로, 마운트 전에는 false
+          const isActive = isMounted && (pathname === item.href || pathname?.startsWith(`${item.href}/`));
 
           return (
             <Link
               key={item.href}
               href={item.href}
+              prefetch={false}
               className={cn(
                 'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                 isActive

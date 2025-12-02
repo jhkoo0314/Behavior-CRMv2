@@ -27,7 +27,7 @@ const NextBestAction = dynamic(
 
 export default function GrowthPage() {
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 w-full space-y-6">
       <div>
         <h1 className="text-3xl font-bold">성장 맵</h1>
         <p className="text-muted-foreground">

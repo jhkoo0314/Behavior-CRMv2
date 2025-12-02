@@ -32,7 +32,7 @@ export function Header({ onMenuClick }: HeaderProps) {
   }, []);
 
   return (
-    <header className="flex h-16 items-center justify-between border-b bg-background px-6">
+    <header className="flex h-16 items-center justify-between border-b bg-background px-4 lg:px-4 xl:px-6">
       <div className="flex items-center gap-4">
         {/* 모바일 메뉴 토글 버튼 */}
         <Button

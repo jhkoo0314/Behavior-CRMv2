@@ -19,13 +19,20 @@ import type { BehaviorType } from '@/constants/behavior-types';
 export interface CreateActivityInput {
   account_id: string;
   contact_id?: string | null;
-  type: ActivityType;
-  behavior: BehaviorType;
-  description: string;
-  quality_score: number; // 0-100
-  quantity_score: number; // 0-100
+  // 기존 필드 (하위 호환성 유지)
+  type?: ActivityType;
+  behavior?: BehaviorType;
+  description?: string;
+  quality_score?: number; // 0-100
+  quantity_score?: number; // 0-100
   duration_minutes?: number;
   performed_at?: Date | string;
+  // 새 필드 (Behavior-Driven Activity Form)
+  outcome?: 'won' | 'ongoing' | 'lost';
+  tags?: string[]; // 태그 배열
+  sentiment_score?: number; // 관계 온도 (0-100)
+  next_action_date?: Date | string; // 다음 활동 예정일
+  dwell_time_seconds?: number; // HIR 측정용 체류 시간 (초)
 }
 
 export async function createActivity(
@@ -34,37 +41,52 @@ export async function createActivity(
   const startTime = Date.now();
   const actionName = 'createActivity';
 
-  logger.action.start(actionName, {
-    account_id: input.account_id,
-    type: input.type,
-    behavior: input.behavior,
-  });
+    logger.action.start(actionName, {
+      account_id: input.account_id,
+      type: input.type,
+      behavior: input.behavior,
+      outcome: input.outcome,
+      tags_count: input.tags?.length || 0,
+    });
 
   try {
     // 입력 검증
     if (!input.account_id || typeof input.account_id !== 'string') {
       throw new Error('Invalid account_id');
     }
-    if (!input.type || !['visit', 'call', 'message', 'presentation', 'follow_up'].includes(input.type)) {
+
+    // 기존 필드 검증 (하위 호환성)
+    if (input.type && !['visit', 'call', 'message', 'presentation', 'follow_up'].includes(input.type)) {
       throw new Error('Invalid activity type');
     }
-    if (!input.behavior || !['approach', 'contact', 'visit', 'presentation', 'question', 'need_creation', 'demonstration', 'follow_up'].includes(input.behavior)) {
+    if (input.behavior && !['approach', 'contact', 'visit', 'presentation', 'question', 'need_creation', 'demonstration', 'follow_up'].includes(input.behavior)) {
       throw new Error('Invalid behavior type');
     }
-    if (!input.description || typeof input.description !== 'string' || input.description.trim().length === 0) {
-      throw new Error('Description is required');
-    }
-    if (input.description.length > 5000) {
+    if (input.description && input.description.length > 5000) {
       throw new Error('Description is too long (max 5000 characters)');
     }
-    if (typeof input.quality_score !== 'number' || input.quality_score < 0 || input.quality_score > 100) {
+    if (input.quality_score !== undefined && (typeof input.quality_score !== 'number' || input.quality_score < 0 || input.quality_score > 100)) {
       throw new Error('Quality score must be between 0 and 100');
     }
-    if (typeof input.quantity_score !== 'number' || input.quantity_score < 0 || input.quantity_score > 100) {
+    if (input.quantity_score !== undefined && (typeof input.quantity_score !== 'number' || input.quantity_score < 0 || input.quantity_score > 100)) {
       throw new Error('Quantity score must be between 0 and 100');
     }
     if (input.duration_minutes !== undefined && (typeof input.duration_minutes !== 'number' || input.duration_minutes < 0)) {
       throw new Error('Duration must be a non-negative number');
+    }
+
+    // 새 필드 검증
+    if (input.outcome && !['won', 'ongoing', 'lost'].includes(input.outcome)) {
+      throw new Error('Invalid outcome');
+    }
+    if (input.tags !== undefined && !Array.isArray(input.tags)) {
+      throw new Error('Tags must be an array');
+    }
+    if (input.sentiment_score !== undefined && (typeof input.sentiment_score !== 'number' || input.sentiment_score < 0 || input.sentiment_score > 100)) {
+      throw new Error('Sentiment score must be between 0 and 100');
+    }
+    if (input.dwell_time_seconds !== undefined && (typeof input.dwell_time_seconds !== 'number' || input.dwell_time_seconds < 0)) {
+      throw new Error('Dwell time must be a non-negative number');
     }
 
     const { userId } = await auth();
@@ -86,22 +108,36 @@ export async function createActivity(
       account_id: input.account_id,
     });
 
+    // INSERT 데이터 구성
+    const insertData: Record<string, unknown> = {
+      user_id: userUuid,
+      account_id: input.account_id,
+      contact_id: input.contact_id || null,
+      performed_at: input.performed_at
+        ? new Date(input.performed_at).toISOString()
+        : new Date().toISOString(),
+    };
+
+    // 기존 필드 (하위 호환성)
+    if (input.type) insertData.type = input.type;
+    if (input.behavior) insertData.behavior = input.behavior;
+    if (input.description !== undefined) insertData.description = input.description || '';
+    if (input.quality_score !== undefined) insertData.quality_score = input.quality_score;
+    if (input.quantity_score !== undefined) insertData.quantity_score = input.quantity_score;
+    if (input.duration_minutes !== undefined) insertData.duration_minutes = input.duration_minutes;
+
+    // 새 필드
+    if (input.outcome) insertData.outcome = input.outcome;
+    if (input.tags !== undefined) insertData.tags = input.tags;
+    if (input.sentiment_score !== undefined) insertData.sentiment_score = input.sentiment_score;
+    if (input.next_action_date) {
+      insertData.next_action_date = new Date(input.next_action_date).toISOString().split('T')[0];
+    }
+    if (input.dwell_time_seconds !== undefined) insertData.dwell_time_seconds = input.dwell_time_seconds;
+
     const { data, error } = await supabase
       .from('activities')
-      .insert({
-        user_id: userUuid,
-        account_id: input.account_id,
-        contact_id: input.contact_id || null,
-        type: input.type,
-        behavior: input.behavior,
-        description: input.description,
-        quality_score: input.quality_score,
-        quantity_score: input.quantity_score,
-        duration_minutes: input.duration_minutes || 0,
-        performed_at: input.performed_at
-          ? new Date(input.performed_at).toISOString()
-          : new Date().toISOString(),
-      })
+      .insert(insertData)
       .select()
       .single();
 

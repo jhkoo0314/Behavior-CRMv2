@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 
 export default function FeedbackPage() {
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 w-full space-y-6">
       <div>
         <h1 className="text-3xl font-bold">피드백</h1>
         <p className="text-muted-foreground">

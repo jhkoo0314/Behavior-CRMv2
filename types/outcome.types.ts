@@ -49,3 +49,5 @@ export interface OutcomeSummary {
     prescription: number;
   };
 }
+
+

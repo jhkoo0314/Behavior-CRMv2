@@ -21,3 +21,5 @@ export const OUTCOME_TYPE_LABELS: Record<OutcomeType, string> = {
 
 export const OUTCOME_TYPE_LIST = Object.values(OUTCOME_TYPES);
 
+
+
