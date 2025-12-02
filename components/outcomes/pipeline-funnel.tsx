@@ -23,7 +23,6 @@ export function PipelineFunnel() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [stages, setStages] = useState<PipelineStage[]>([]);
-  const [conversionRate, setConversionRate] = useState<number>(0);
 
   useEffect(() => {
     async function fetchData() {
@@ -36,7 +35,6 @@ export function PipelineFunnel() {
         console.log('파이프라인 단계:', summary.stages);
         console.log('전환율:', summary.conversionRate);
         setStages(summary.stages);
-        setConversionRate(summary.conversionRate);
       } catch (err) {
         console.error('파이프라인 조회 실패:', err);
         setError(err instanceof Error ? err : new Error('데이터를 불러올 수 없습니다.'));
@@ -149,7 +147,7 @@ export function PipelineFunnel() {
             {stages.find((s) => s.stage === 'negotiation')?.count &&
             stages.find((s) => s.stage === 'negotiation')!.count >= 7 ? (
               <>
-                '협상' 단계에 {stages.find((s) => s.stage === 'negotiation')!.count}건이 몰려 있습니다.
+                &apos;협상&apos; 단계에 {stages.find((s) => s.stage === 'negotiation')!.count}건이 몰려 있습니다.
                 PHR 점수를 위해 이번 주 내로 2건 이상 클로징 시도가 필요합니다.
               </>
             ) : (
