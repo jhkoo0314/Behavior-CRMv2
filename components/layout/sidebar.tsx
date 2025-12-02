@@ -17,9 +17,12 @@ import {
   Activity,
   FileText,
   Users,
+  Menu,
+  ChevronLeft,
 } from 'lucide-react';
 import { UserRole, USER_ROLES } from '@/constants/user-roles';
 import { useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
 
 interface NavItem {
   title: string;
@@ -64,9 +67,11 @@ const navItems: NavItem[] = [
 
 interface SidebarProps {
   className?: string;
+  isOpen?: boolean;
+  onToggle?: () => void;
 }
 
-export function Sidebar({ className }: SidebarProps) {
+export function Sidebar({ className, isOpen = true, onToggle }: SidebarProps) {
   const pathname = usePathname();
   // 초기 상태를 서버와 클라이언트에서 동일하게 유지
   const [userRole] = useState<UserRole | null>(USER_ROLES.SALESPERSON);
@@ -85,18 +90,45 @@ export function Sidebar({ className }: SidebarProps) {
   return (
     <aside
       className={cn(
-        'flex h-full w-64 flex-col border-r bg-background',
+        'flex h-full flex-col border-r bg-background transition-all duration-300',
+        isOpen ? 'w-64' : 'w-16',
         className
       )}
     >
-      <div className="flex h-16 items-center border-b px-6">
-        <Link 
-          href="/dashboard" 
-          className="text-lg font-semibold"
-          prefetch={false}
-        >
-          Behavior CRM
-        </Link>
+      <div className={cn(
+        'flex h-16 items-center border-b transition-all duration-300',
+        isOpen ? 'justify-between px-6' : 'justify-center px-2'
+      )}>
+        {isOpen ? (
+          <>
+            <Link 
+              href="/" 
+              className="text-lg font-semibold"
+              prefetch={false}
+            >
+              Behavior CRM
+            </Link>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onToggle}
+              className="h-8 w-8"
+            >
+              <ChevronLeft className="h-5 w-5" />
+              <span className="sr-only">사이드바 닫기</span>
+            </Button>
+          </>
+        ) : (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onToggle}
+            className="h-8 w-8"
+          >
+            <Menu className="h-5 w-5" />
+            <span className="sr-only">사이드바 열기</span>
+          </Button>
+        )}
       </div>
       <nav className="flex-1 space-y-1 p-4">
         {filteredNavItems.map((item) => {
@@ -110,14 +142,16 @@ export function Sidebar({ className }: SidebarProps) {
               href={item.href}
               prefetch={false}
               className={cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                'flex items-center rounded-lg transition-colors',
+                isOpen ? 'gap-3 px-3 py-2 text-sm font-medium' : 'justify-center p-2',
                 isActive
                   ? 'bg-primary text-primary-foreground'
                   : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
               )}
+              title={!isOpen ? item.title : undefined}
             >
               <Icon className="h-5 w-5" />
-              {item.title}
+              {isOpen && <span>{item.title}</span>}
             </Link>
           );
         })}

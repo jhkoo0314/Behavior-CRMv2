@@ -23,6 +23,7 @@ import { getCoachingSignals } from '@/actions/coaching-signals/get-signals';
 import { getAccounts } from '@/actions/accounts/get-accounts';
 import { getTeamMembers } from '@/actions/users/get-team-members';
 import { calculatePeriod } from '@/lib/utils/chart-data';
+import { COMPETITOR_SIGNAL_TYPE_LABELS } from '@/constants/competitor-signal-types';
 import type { CompetitorSignal } from '@/types/database.types';
 import type { Account } from '@/types/database.types';
 
@@ -64,8 +65,12 @@ export function MarketIntel() {
         // 경쟁사별, 태그별로 그룹화
         const topicMap = new Map<string, number>();
         for (const signal of competitorSignalsResult.data) {
-          // competitor_name을 기반으로 태그 생성
-          const topic = `${signal.competitor_name} ${signal.tag || '활동'}`;
+          // competitor_name과 type을 기반으로 태그 생성
+          const typeLabel =
+            COMPETITOR_SIGNAL_TYPE_LABELS[signal.type as keyof typeof COMPETITOR_SIGNAL_TYPE_LABELS] ||
+            signal.type ||
+            '활동';
+          const topic = `${signal.competitor_name} ${typeLabel}`;
           topicMap.set(topic, (topicMap.get(topic) || 0) + 1);
         }
 

@@ -18,18 +18,19 @@ interface AppLayoutProps {
 
 export function AppLayout({ children }: AppLayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   return (
     <div className="flex h-screen">
       {/* 데스크탑 사이드바 */}
       <aside className="hidden lg:block lg:flex-shrink-0">
-        <Sidebar />
+        <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
       </aside>
 
       {/* 모바일 사이드바 (Sheet) */}
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <SheetContent side="left" className="w-64 p-0">
-          <Sidebar />
+          <Sidebar isOpen={true} onToggle={() => setMobileMenuOpen(false)} />
         </SheetContent>
       </Sheet>
 

@@ -55,9 +55,9 @@ export async function POST() {
     } else {
       // Supabase에 role이 없으면 Clerk 메타데이터에서 읽기 (없으면 기본값 'salesperson')
       role =
-        (clerkUser.publicMetadata?.role as string) ||
-        (clerkUser.privateMetadata?.role as string) ||
-        'salesperson';
+      (clerkUser.publicMetadata?.role as string) ||
+      (clerkUser.privateMetadata?.role as string) ||
+      'salesperson';
       console.log('📌 Clerk 메타데이터에서 role 읽기:', role);
     }
 
