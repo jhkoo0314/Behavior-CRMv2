@@ -45,7 +45,7 @@ export default function GrowthPage() {
   console.groupEnd();
 
   return (
-    <div className="min-w-0 w-full space-y-6">
+    <div className="min-w-0 w-full max-w-4xl mx-auto px-4 space-y-6">
       {/* 헤더 */}
       <div>
         <h1 className="bg-gradient-to-r from-slate-900 to-indigo-600 bg-clip-text text-3xl font-extrabold text-transparent">
