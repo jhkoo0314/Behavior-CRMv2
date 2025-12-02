@@ -144,13 +144,13 @@ export function BehaviorRadarChart() {
 
   return (
     <Card className="flex flex-col items-center justify-center h-full">
-      <CardHeader className="w-full">
-        <CardTitle>행동 균형 분석</CardTitle>
-        <CardDescription>4대 지표의 밸런스를 시각화합니다.</CardDescription>
+      <CardHeader className="w-full pb-2">
+        <CardTitle className="text-lg">행동 균형 분석</CardTitle>
+        <CardDescription className="text-xs">4대 지표의 밸런스를 시각화합니다.</CardDescription>
       </CardHeader>
-      <CardContent className="flex flex-col items-center justify-center w-full">
+      <CardContent className="flex flex-col items-center justify-center w-full flex-1 py-1">
         {/* SVG 레이더 차트 */}
-        <svg width="240" height="240" viewBox="0 0 200 200" className="mb-4">
+        <svg width="200" height="200" viewBox="0 0 200 200" className="mb-2">
           {/* 배경 원 */}
           <circle cx="100" cy="100" r="80" fill="none" stroke="#e2e8f0" strokeDasharray="4 4" />
           <circle cx="100" cy="100" r="40" fill="none" stroke="#e2e8f0" />

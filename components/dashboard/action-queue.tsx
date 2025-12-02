@@ -140,11 +140,11 @@ export function ActionQueue() {
 
   return (
     <Card className="flex flex-col h-full">
-      <CardHeader>
+      <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle>오늘의 추천 행동</CardTitle>
-            <CardDescription>점수를 올리기 위한 최적의 행동입니다.</CardDescription>
+            <CardTitle className="text-lg">오늘의 추천 행동</CardTitle>
+            <CardDescription className="text-xs">점수를 올리기 위한 최적의 행동입니다.</CardDescription>
           </div>
           {urgentCount > 0 && (
             <Badge variant="destructive" className="text-xs">
@@ -153,7 +153,7 @@ export function ActionQueue() {
           )}
         </div>
       </CardHeader>
-      <CardContent className="flex flex-col gap-3 flex-1">
+      <CardContent className="flex flex-col gap-2 flex-1 py-2">
         {actions.map((action, index) => {
           const iconInfo = getActionIcon(action.reason);
           const buttonText = getActionButtonText(action.reason);

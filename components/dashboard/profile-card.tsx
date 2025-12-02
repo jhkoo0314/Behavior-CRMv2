@@ -151,34 +151,34 @@ export function ProfileCard() {
   const phrChange = previousMetrics ? getChange(metrics.phr, previousMetrics.phr) : { value: 0, icon: null };
 
   return (
-    <Card className="flex flex-col items-center text-center">
-      <CardHeader className="w-full">
-        <CardTitle>My Behavior Quality</CardTitle>
+    <Card className="flex flex-col items-center text-center h-full">
+      <CardHeader className="w-full pb-2">
+        <CardTitle className="text-lg">My Behavior Quality</CardTitle>
       </CardHeader>
-      <CardContent className="flex flex-col items-center gap-4 w-full">
+      <CardContent className="flex flex-col items-center gap-2 w-full flex-1 py-2">
         {/* 아바타 */}
-        <div className="w-20 h-20 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-2xl font-semibold">
+        <div className="w-16 h-16 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xl font-semibold">
           {userInitials}
         </div>
 
         {/* Total Score */}
-        <div className="text-5xl font-extrabold text-blue-600 leading-none">
+        <div className="text-4xl font-extrabold text-blue-600 leading-none">
           {metrics.totalScore}
         </div>
-        <div className="text-sm text-muted-foreground">Total Score</div>
+        <div className="text-xs text-muted-foreground">Total Score</div>
 
         {/* 랭크 배지 */}
-        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${rankBadge.className}`}>
+        <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${rankBadge.className}`}>
           {rankBadge.text}
         </span>
 
         {/* 구분선 */}
-        <hr className="w-full border-t my-6" />
+        <hr className="w-full border-t my-3" />
 
         {/* 4개 지표 그리드 */}
-        <div className="grid grid-cols-2 gap-3 w-full">
+        <div className="grid grid-cols-2 gap-2 w-full">
           {/* HIR */}
-          <div className="flex flex-col gap-1 p-3 bg-slate-50 rounded-lg">
+          <div className="flex flex-col gap-0.5 p-2 bg-slate-50 rounded-lg">
             <span className="text-xs font-semibold text-muted-foreground">HIR (정직)</span>
             <span className="text-xl font-bold text-green-600">{metrics.hir}%</span>
             {hirChange.value > 0 && (
