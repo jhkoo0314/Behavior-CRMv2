@@ -41,7 +41,7 @@ export function HirGrowthScatter() {
       <div className="mb-5">
         <h3 className="text-lg font-bold">정직입력률(HIR)과 성장의 상관관계</h3>
         <p className="mt-1 text-xs text-slate-500">
-          "솔직하게 기록할수록 매출은 오릅니다"에 대한 데이터 증명
+          &quot;솔직하게 기록할수록 매출은 오릅니다&quot;에 대한 데이터 증명
         </p>
       </div>
 
@@ -106,7 +106,7 @@ export function HirGrowthScatter() {
         </div>
         <p className="text-xs leading-relaxed text-slate-600">
           우리 조직 데이터 분석 결과, <strong>HIR이 80% 이상인 그룹</strong>은 그렇지 않은 그룹보다{' '}
-          <strong>성장률이 2.5배</strong> 높습니다. 단순 기록이 아니라 '회고'를 하기 때문입니다.
+          <strong>성장률이 2.5배</strong> 높습니다. 단순 기록이 아니라 &apos;회고&apos;를 하기 때문입니다.
         </p>
       </div>
     </div>

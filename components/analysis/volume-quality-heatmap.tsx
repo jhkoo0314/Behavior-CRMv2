@@ -55,7 +55,7 @@ export function VolumeQualityHeatmap() {
         <div>
           <h3 className="text-lg font-bold">활동량(Volume) × 행동품질(Quality) 매트릭스</h3>
           <p className="mt-1 text-xs text-slate-500">
-            나는 '열심히만 하는 바보(Busy Fool)' 인가, '스나이퍼'인가?
+            나는 &apos;열심히만 하는 바보(Busy Fool)&apos; 인가, &apos;스나이퍼&apos;인가?
           </p>
         </div>
         <div className="rounded-full bg-blue-50 px-2 py-1 text-xs font-semibold text-blue-600">
@@ -128,7 +128,7 @@ export function VolumeQualityHeatmap() {
           💡 Analysis Insight
         </div>
         <p className="text-xs leading-relaxed text-slate-600">
-          현재 <strong>'Busy Fool' (Q4)</strong> 영역에 위치해 있습니다. 방문 횟수는 상위 10%이나,{' '}
+          현재 <strong>&apos;Busy Fool&apos; (Q4)</strong> 영역에 위치해 있습니다. 방문 횟수는 상위 10%이나,{' '}
           <strong>HIR(정직성) 및 태그 다양성</strong>이 부족합니다. 무의미한 단순 방문을 줄이고, 관계 온도(RTR)를 높이는 미팅에 집중하세요.
         </p>
       </div>
