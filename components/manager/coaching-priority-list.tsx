@@ -10,15 +10,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getTeamMembers } from '@/actions/users/get-team-members';
-import { getCoachingSignals } from '@/actions/coaching-signals/get-signals';
-import { getBehaviorScoresByUser } from '@/actions/behavior-scores/get-behavior-scores-by-user';
-import { calculateHIR } from '@/lib/analytics/calculate-hir';
-import { calculateRTR } from '@/lib/analytics/calculate-rtr';
-import { calculateBCR } from '@/lib/analytics/calculate-bcr';
-import { calculatePHR } from '@/lib/analytics/calculate-phr';
-import { calculatePeriod } from '@/lib/utils/chart-data';
-import { BEHAVIOR_TYPE_LIST } from '@/constants/behavior-types';
+import { mockTeamMembers, mockMemberMetrics, mockCoachingSignals } from '@/lib/mock/manager-mock-data';
 import type { User } from '@/types/database.types';
 
 interface MemberMetrics {
@@ -158,118 +150,79 @@ export function CoachingPriorityList() {
   const [topPerformers, setTopPerformers] = useState<MemberMetrics[]>([]);
 
   useEffect(() => {
-    async function fetchData() {
-      console.group('CoachingPriorityList: 데이터 조회 시작');
-      setIsLoading(true);
-      setError(null);
+    console.group('CoachingPriorityList: Mock 데이터 로드 시작');
+    setIsLoading(true);
+    setError(null);
 
-      try {
-        // 팀원 목록 조회
-        const teamMembersResult = await getTeamMembers({});
-        console.log('조회된 팀원 수:', teamMembersResult.data.length);
-
-        // 위험 신호 조회
-        const signalsResult = await getCoachingSignals({
-          isResolved: false,
-        });
-        console.log('조회된 위험 신호 수:', signalsResult.data.length);
-
-        // 위험 신호를 사용자별로 그룹화
-        const riskSignalsByUser = new Map<string, typeof signalsResult.data>();
-        for (const signal of signalsResult.data) {
-          if (!riskSignalsByUser.has(signal.user_id)) {
-            riskSignalsByUser.set(signal.user_id, []);
-          }
-          riskSignalsByUser.get(signal.user_id)!.push(signal);
+    try {
+      // 위험 신호를 사용자별로 그룹화
+      const riskSignalsByUser = new Map<string, typeof mockCoachingSignals>();
+      for (const signal of mockCoachingSignals) {
+        if (!riskSignalsByUser.has(signal.user_id)) {
+          riskSignalsByUser.set(signal.user_id, []);
         }
-
-        const { start, end } = calculatePeriod(30);
-
-        // 각 팀원의 지표 계산
-        const memberMetrics: MemberMetrics[] = [];
-
-        for (const member of teamMembersResult.data) {
-          if (!member.id) continue;
-
-          try {
-            // 각 지표 계산
-            const [hir, rtr, bcr, phr] = await Promise.all([
-              calculateHIR(member.id, start, end),
-              calculateRTR(member.id, start, end),
-              calculateBCR(member.id, start, end),
-              calculatePHR(member.id, start, end),
-            ]);
-
-            const totalScore = Math.round((hir + rtr + bcr + phr) / 4);
-
-            // 위험도 판단
-            const userSignals = riskSignalsByUser.get(member.id) || [];
-            const highPrioritySignals = userSignals.filter((s) => s.priority === 'high');
-            const hasLowScore = rtr < 60 || bcr < 60 || phr < 60;
-
-            let riskLevel: 'high' | 'medium' | 'low' = 'low';
-            let riskReason: string | undefined;
-
-            if (highPrioritySignals.length > 0 || hasLowScore) {
-              riskLevel = highPrioritySignals.length > 0 ? 'high' : 'medium';
-              if (rtr < 60) {
-                riskReason = 'RTR 급락 / 방문량 저조';
-              } else if (phr < 60) {
-                riskReason = 'PHR 관리 부실 (Dead Lead)';
-              } else if (bcr < 60) {
-                riskReason = 'BCR 저조 / 루틴 부재';
-              } else if (userSignals.length > 0) {
-                riskReason = userSignals[0].message || '위험 신호 발생';
-              }
-            }
-
-            memberMetrics.push({
-              user: member,
-              hir,
-              rtr,
-              bcr,
-              phr,
-              totalScore,
-              riskLevel,
-              riskReason,
-            });
-          } catch (err) {
-            console.error(`팀원 ${member.name} 지표 계산 실패:`, err);
-            // 개별 팀원 오류는 무시하고 계속 진행
-          }
-        }
-
-        // 위험 멤버 필터링 및 정렬 (위험도 높은 순, 점수 낮은 순)
-        const risks = memberMetrics
-          .filter((m) => m.riskLevel !== 'low')
-          .sort((a, b) => {
-            if (a.riskLevel !== b.riskLevel) {
-              return a.riskLevel === 'high' ? -1 : 1;
-            }
-            return a.totalScore - b.totalScore;
-          });
-
-        // Top Performers 필터링 및 정렬 (점수 높은 순)
-        const top = memberMetrics
-          .filter((m) => m.riskLevel === 'low' && m.totalScore >= 80)
-          .sort((a, b) => b.totalScore - a.totalScore)
-          .slice(0, 5); // 상위 5명만
-
-        console.log('위험 멤버:', risks);
-        console.log('Top Performers:', top);
-
-        setRiskMembers(risks);
-        setTopPerformers(top);
-      } catch (err) {
-        console.error('Coaching Priority List 조회 실패:', err);
-        setError(err instanceof Error ? err : new Error('데이터를 불러올 수 없습니다.'));
-      } finally {
-        setIsLoading(false);
-        console.groupEnd();
+        riskSignalsByUser.get(signal.user_id)!.push(signal);
       }
-    }
 
-    fetchData();
+      // Mock 데이터를 MemberMetrics 형식으로 변환
+      const memberMetrics: MemberMetrics[] = mockTeamMembers.map((member) => {
+        const metrics = mockMemberMetrics.find((m) => m.userId === member.id);
+        if (!metrics) {
+          // 기본값
+          return {
+            user: member,
+            hir: 70,
+            rtr: 65,
+            bcr: 68,
+            phr: 62,
+            totalScore: 66,
+            riskLevel: 'low' as const,
+          };
+        }
+
+        const userSignals = riskSignalsByUser.get(member.id) || [];
+        const highPrioritySignals = userSignals.filter((s) => s.priority === 'high');
+
+        return {
+          user: member,
+          hir: metrics.hir,
+          rtr: metrics.rtr,
+          bcr: metrics.bcr,
+          phr: metrics.phr,
+          totalScore: metrics.totalScore,
+          riskLevel: metrics.riskLevel,
+          riskReason: metrics.riskReason,
+        };
+      });
+
+      // 위험 멤버 필터링 및 정렬 (위험도 높은 순, 점수 낮은 순)
+      const risks = memberMetrics
+        .filter((m) => m.riskLevel !== 'low')
+        .sort((a, b) => {
+          if (a.riskLevel !== b.riskLevel) {
+            return a.riskLevel === 'high' ? -1 : 1;
+          }
+          return a.totalScore - b.totalScore;
+        });
+
+      // Top Performers 필터링 및 정렬 (점수 높은 순)
+      const top = memberMetrics
+        .filter((m) => m.riskLevel === 'low' && m.totalScore >= 80)
+        .sort((a, b) => b.totalScore - a.totalScore)
+        .slice(0, 5); // 상위 5명만
+
+      console.log('위험 멤버:', risks);
+      console.log('Top Performers:', top);
+
+      setRiskMembers(risks);
+      setTopPerformers(top);
+    } catch (err) {
+      console.error('Mock 데이터 로드 실패:', err);
+      setError(err instanceof Error ? err : new Error('데이터를 불러올 수 없습니다.'));
+    } finally {
+      setIsLoading(false);
+      console.groupEnd();
+    }
   }, []);
 
   if (isLoading) {

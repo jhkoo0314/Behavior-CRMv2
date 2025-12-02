@@ -20,6 +20,7 @@ export interface CreateAccountInput {
   patient_count?: number;
   revenue?: number;
   notes?: string;
+  tier?: 'S' | 'A' | 'B' | 'RISK';
 }
 
 export async function createAccount(input: CreateAccountInput): Promise<Account> {
@@ -89,6 +90,7 @@ export async function createAccount(input: CreateAccountInput): Promise<Account>
         patient_count: input.patient_count || 0,
         revenue: input.revenue || 0,
         notes: input.notes?.trim() || null,
+        tier: input.tier || 'B',
       })
       .select()
       .single();

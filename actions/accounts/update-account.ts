@@ -20,6 +20,7 @@ export interface UpdateAccountInput {
   patient_count?: number;
   revenue?: number;
   notes?: string;
+  tier?: 'S' | 'A' | 'B' | 'RISK';
 }
 
 export async function updateAccount(input: UpdateAccountInput): Promise<Account> {
@@ -58,6 +59,7 @@ export async function updateAccount(input: UpdateAccountInput): Promise<Account>
     if (input.patient_count !== undefined) updateData.patient_count = input.patient_count;
     if (input.revenue !== undefined) updateData.revenue = input.revenue;
     if (input.notes !== undefined) updateData.notes = input.notes || null;
+    if (input.tier !== undefined) updateData.tier = input.tier;
 
     const { data, error } = await supabase
       .from('accounts')

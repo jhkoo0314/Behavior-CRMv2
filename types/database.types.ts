@@ -32,6 +32,7 @@ export interface Account {
   patient_count: number;
   revenue: number;
   notes: string | null;
+  tier: 'S' | 'A' | 'B' | 'RISK'; // 계정 중요도 등급
   created_at: string;
   updated_at: string;
 }
@@ -171,6 +172,40 @@ export interface AnalyticsCache {
   period_end: string | null;
   expires_at: string;
   created_at: string;
+}
+
+/**
+ * Account 통계 데이터 타입
+ */
+export interface AccountStats {
+  totalAccounts: number;
+  activeAccounts: number;
+  coverage: number; // 이번 달 방문한 고객 수 / 전체 고객 수 (%)
+  sTierFocus: number; // S-Tier 계정 수 / 전체 계정 수 (%)
+  riskAccounts: number; // 14일 이상 미방문 계정 수
+}
+
+/**
+ * Account 메트릭 포함 타입 (RTR, 최근 방문일, 파이프라인 상태)
+ */
+export interface AccountWithMetrics extends Account {
+  rtr: number; // 관계 온도 (0-100)
+  lastVisitDate: string | null; // 최근 방문일 (ISO string)
+  daysSinceLastVisit: number | null; // 마지막 방문으로부터 경과 일수
+  pipelineStatus: 'negotiation' | 'opportunity' | 'at_risk' | null; // 파이프라인 상태
+  region: string | null; // 파싱된 지역 정보
+  contacts: string | null; // 담당자 정보 (예: "김철수 교수 외 3명")
+}
+
+/**
+ * Risk Alert 타입
+ */
+export interface RiskAlert {
+  accountId: string;
+  accountName: string;
+  type: 'rtr_drop' | 'no_visit'; // RTR 급락 또는 미방문
+  message: string;
+  severity: 'high' | 'medium' | 'low';
 }
 
 

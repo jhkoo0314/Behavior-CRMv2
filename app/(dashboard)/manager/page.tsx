@@ -3,10 +3,11 @@
  *
  * 팀장/본부 관리자용 대시보드
  * PRD 4.3 참고
+ * 
+ * 시연용: 모든 사용자가 접근 가능합니다.
+ * 프로덕션 전환 시 역할 체크를 다시 활성화해야 합니다.
  */
 
-import { requireAnyRole } from "@/lib/auth/check-role";
-import { USER_ROLES } from "@/constants/user-roles";
 import { CoachingCockpitHeader } from "@/components/manager/coaching-cockpit-header";
 import { TeamKpiRow } from "@/components/manager/team-kpi-row";
 import { CoachingPriorityList } from "@/components/manager/coaching-priority-list";
@@ -14,9 +15,6 @@ import { TeamBalanceRadar } from "@/components/manager/team-balance-radar";
 import { MarketIntel } from "@/components/manager/market-intel";
 
 export default async function ManagerPage() {
-  // 관리자만 접근 가능
-  await requireAnyRole([USER_ROLES.MANAGER, USER_ROLES.HEAD_MANAGER]);
-
   return (
     <div className="min-w-0 w-full space-y-6 max-w-[1440px] mx-auto p-6">
       {/* Header */}

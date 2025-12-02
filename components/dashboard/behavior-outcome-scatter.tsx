@@ -12,6 +12,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { ScatterDataPoint } from '@/actions/analytics/get-team-scatter-data';
+import { mockCurrentUserScatterData, mockTeamMembersScatterData } from '@/lib/mock/dashboard-mock-data';
 
 export function BehaviorOutcomeScatter() {
   const [isLoading, setIsLoading] = useState(true);
@@ -20,72 +21,25 @@ export function BehaviorOutcomeScatter() {
   const [currentUserPoint, setCurrentUserPoint] = useState<ScatterDataPoint | null>(null);
 
   useEffect(() => {
-    function generateMockData() {
-      console.group('BehaviorOutcomeScatter: Mock 데이터 생성 시작');
-      setIsLoading(true);
-      setError(null);
+    console.group('BehaviorOutcomeScatter: Mock 데이터 로드 시작');
+    setIsLoading(true);
+    setError(null);
 
-      try {
-        // Mock 팀원 데이터 생성 (10~15명)
-        const teamMemberCount = 12;
-        const teamMembers: ScatterDataPoint[] = [];
-        
-        // 팀원 이름 목록
-        const names = [
-          '김영수', '이지은', '박민준', '최수진', '정호영',
-          '강미영', '윤태현', '임서연', '한동욱', '오지혜',
-          '신준호', '배수아', '조현우', '권나영', '류성민'
-        ];
+    try {
+      // 공통 Mock 데이터 사용
+      console.log('로드된 Mock 데이터 포인트 수:', mockTeamMembersScatterData.length + 1);
+      console.log('현재 사용자:', mockCurrentUserScatterData);
+      console.log('팀원 수:', mockTeamMembersScatterData.length);
 
-        for (let i = 0; i < teamMemberCount; i++) {
-          // 행동 품질 점수: 30~90 범위에서 분포
-          // 양의 상관관계를 보이도록 생성 (행동 점수가 높으면 매출 달성률도 높음)
-          const baseScore = 30 + (i / teamMemberCount) * 60; // 30~90 선형 분포
-          const scoreVariation = (Math.random() - 0.5) * 15; // ±7.5 랜덤 변동
-          const totalScore = Math.max(30, Math.min(95, Math.round(baseScore + scoreVariation)));
-
-          // 매출 달성률: 행동 점수와 양의 상관관계 (약간의 변동 포함)
-          // 행동 점수가 높을수록 매출 달성률도 높아지는 패턴
-          const baseRate = totalScore * 0.85 + (Math.random() - 0.5) * 10; // 행동 점수의 85% + 변동
-          const conversionRate = Math.max(20, Math.min(95, Math.round(baseRate * 10) / 10));
-
-          teamMembers.push({
-            userId: `mock-user-${i}`,
-            userName: names[i] || `팀원${i + 1}`,
-            totalScore,
-            conversionRate,
-            isCurrentUser: false,
-          });
-        }
-
-        // 현재 사용자 데이터 생성 (중간~상위 위치)
-        const currentUserScore = 65 + (Math.random() - 0.5) * 10; // 60~70 범위
-        const currentUserRate = currentUserScore * 0.82 + (Math.random() - 0.5) * 8;
-        
-        const currentUser: ScatterDataPoint = {
-          userId: 'mock-current-user',
-          userName: '나',
-          totalScore: Math.round(currentUserScore),
-          conversionRate: Math.round(currentUserRate * 10) / 10,
-          isCurrentUser: true,
-        };
-
-        console.log('생성된 Mock 데이터 포인트 수:', teamMembers.length + 1);
-        console.log('현재 사용자:', currentUser);
-        console.log('팀원 수:', teamMembers.length);
-
-        setCurrentUserPoint(currentUser);
-        setDataPoints(teamMembers);
-      } catch (err) {
-        console.error('Mock 데이터 생성 실패:', err);
-        setError(err instanceof Error ? err : new Error('데이터를 불러올 수 없습니다.'));
-      } finally {
-        setIsLoading(false);
-        console.groupEnd();
-      }
+      setCurrentUserPoint(mockCurrentUserScatterData);
+      setDataPoints(mockTeamMembersScatterData);
+    } catch (err) {
+      console.error('Mock 데이터 로드 실패:', err);
+      setError(err instanceof Error ? err : new Error('데이터를 불러올 수 없습니다.'));
+    } finally {
+      setIsLoading(false);
+      console.groupEnd();
     }
-
-    generateMockData();
   }, []);
 
   if (isLoading) {

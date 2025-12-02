@@ -45,6 +45,7 @@ const accountFormSchema = z.object({
   patient_count: z.number().int().min(0).max(10000000).optional(),
   revenue: z.number().int().min(0).max(1000000000000).optional(),
   notes: z.string().max(2000, '메모는 2000자 이하여야 합니다').optional(),
+  tier: z.enum(['S', 'A', 'B', 'RISK']).default('B'),
 });
 
 export type AccountFormData = z.infer<typeof accountFormSchema>;
@@ -65,6 +66,13 @@ const ACCOUNT_TYPE_LABELS: Record<
   pharmacy: '약국',
 };
 
+const TIER_LABELS: Record<'S' | 'A' | 'B' | 'RISK', string> = {
+  S: 'S-Tier (핵심)',
+  A: 'A-Tier (주요)',
+  B: 'B-Tier (일반)',
+  RISK: 'RISK (이탈 위험)',
+};
+
 export function AccountForm({ account, onSubmit, onCancel }: AccountFormProps) {
   const form = useForm<AccountFormData>({
     resolver: zodResolver(accountFormSchema),
@@ -78,6 +86,7 @@ export function AccountForm({ account, onSubmit, onCancel }: AccountFormProps) {
           patient_count: account.patient_count || 0,
           revenue: account.revenue || 0,
           notes: account.notes || '',
+          tier: account.tier || 'B',
         }
       : {
           name: '',
@@ -88,6 +97,7 @@ export function AccountForm({ account, onSubmit, onCancel }: AccountFormProps) {
           patient_count: 0,
           revenue: 0,
           notes: '',
+          tier: 'B',
         },
   });
 
@@ -133,6 +143,35 @@ export function AccountForm({ account, onSubmit, onCancel }: AccountFormProps) {
                 </FormControl>
                 <SelectContent>
                   {Object.entries(ACCOUNT_TYPE_LABELS).map(([value, label]) => (
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="tier"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>중요도 등급 (Tier) *</FormLabel>
+              <Select
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+                value={field.value}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="중요도 등급을 선택하세요" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {Object.entries(TIER_LABELS).map(([value, label]) => (
                     <SelectItem key={value} value={value}>
                       {label}
                     </SelectItem>

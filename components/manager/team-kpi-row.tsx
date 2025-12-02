@@ -13,8 +13,9 @@
 import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getTeamKPIs } from '@/actions/manager/get-team-kpis';
 import { formatNumber } from '@/lib/utils/chart-data';
+import { mockTeamKPIs } from '@/lib/mock/manager-mock-data';
+import type { TeamKPIs } from '@/actions/manager/get-team-kpis';
 
 interface KPICardProps {
   title: string;
@@ -56,28 +57,24 @@ function KPICard({ title, value, trend, valueColor }: KPICardProps) {
 export function TeamKpiRow() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  const [kpis, setKpis] = useState<Awaited<ReturnType<typeof getTeamKPIs>> | null>(null);
+  const [kpis, setKpis] = useState<TeamKPIs | null>(null);
 
   useEffect(() => {
-    async function fetchData() {
-      console.group('TeamKpiRow: 데이터 조회 시작');
-      setIsLoading(true);
-      setError(null);
+    console.group('TeamKpiRow: Mock 데이터 로드 시작');
+    setIsLoading(true);
+    setError(null);
 
-      try {
-        const kpiData = await getTeamKPIs();
-        console.log('KPI 데이터:', kpiData);
-        setKpis(kpiData);
-      } catch (err) {
-        console.error('팀 KPI 조회 실패:', err);
-        setError(err instanceof Error ? err : new Error('데이터를 불러올 수 없습니다.'));
-      } finally {
-        setIsLoading(false);
-        console.groupEnd();
-      }
+    try {
+      // 공통 Mock 데이터 사용
+      console.log('로드된 Mock KPI 데이터:', mockTeamKPIs);
+      setKpis(mockTeamKPIs);
+    } catch (err) {
+      console.error('Mock 데이터 로드 실패:', err);
+      setError(err instanceof Error ? err : new Error('데이터를 불러올 수 없습니다.'));
+    } finally {
+      setIsLoading(false);
+      console.groupEnd();
     }
-
-    fetchData();
   }, []);
 
   if (isLoading) {

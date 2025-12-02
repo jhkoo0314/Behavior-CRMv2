@@ -6,13 +6,16 @@
  * 사용자별 또는 팀 전체의 코칭 신호를 조회합니다.
  * - 일반 사용자: 자신의 신호만 조회 가능
  * - 관리자: 팀 전체 신호 조회 가능
+ * 
+ * 시연용: 모든 사용자가 팀 전체 신호를 조회할 수 있습니다.
+ * 프로덕션 전환 시 역할 체크를 다시 활성화해야 합니다.
  */
 
 import { auth } from '@clerk/nextjs/server';
 import { createClerkSupabaseClient } from '@/lib/supabase/server';
 import { getCurrentUserId } from '@/lib/supabase/get-user-id';
-import { checkAnyRole } from '@/lib/auth/check-role';
-import { USER_ROLES } from '@/constants/user-roles';
+// import { checkAnyRole } from '@/lib/auth/check-role'; // 시연용: 주석 처리
+// import { USER_ROLES } from '@/constants/user-roles'; // 시연용: 주석 처리
 import type { CoachingSignal } from '@/types/database.types';
 
 export interface GetCoachingSignalsInput {
@@ -38,7 +41,10 @@ export async function getCoachingSignals(
     }
 
     const supabase = await createClerkSupabaseClient();
-    const isManager = await checkAnyRole([USER_ROLES.MANAGER, USER_ROLES.HEAD_MANAGER]);
+    // 시연용: 역할 체크 비활성화 - 모든 사용자가 관리자처럼 동작
+    // 프로덕션 전환 시 아래 주석을 해제하세요:
+    // const isManager = await checkAnyRole([USER_ROLES.MANAGER, USER_ROLES.HEAD_MANAGER]);
+    const isManager = true; // 시연용: 항상 true로 설정
 
     let query = supabase
       .from('coaching_signals')
@@ -46,16 +52,18 @@ export async function getCoachingSignals(
 
     // 사용자 필터링
     if (input.userId) {
-      // 관리자만 다른 사용자의 신호 조회 가능
-      if (!isManager) {
-        throw new Error('Only managers can view other users\' signals');
-      }
+      // 시연용: 모든 사용자가 다른 사용자의 신호 조회 가능
+      // 프로덕션 전환 시 아래 주석을 해제하세요:
+      // if (!isManager) {
+      //   throw new Error('Only managers can view other users\' signals');
+      // }
       query = query.eq('user_id', input.userId);
     } else {
-      // 일반 사용자는 자신의 신호만 조회
-      if (!isManager) {
-        query = query.eq('user_id', userUuid);
-      }
+      // 시연용: 모든 사용자가 팀 전체 조회 가능
+      // 프로덕션 전환 시 아래 주석을 해제하세요:
+      // if (!isManager) {
+      //   query = query.eq('user_id', userUuid);
+      // }
       // 관리자는 팀 전체 조회 (필터 없음)
     }
 

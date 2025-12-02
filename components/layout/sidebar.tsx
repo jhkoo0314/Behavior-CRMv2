@@ -1,7 +1,7 @@
 /**
  * 사이드바 네비게이션 컴포넌트
  * 
- * 메뉴 항목: Dashboard, Analysis, Growth, Activities, Outcomes
+ * 메뉴 항목: Dashboard, Analysis, Growth, Activities, Accounts, Outcomes, Manager
  * 역할별 메뉴 표시/숨김 로직 포함
  */
 
@@ -17,6 +17,7 @@ import {
   Activity,
   FileText,
   Users,
+  Building2,
   Menu,
   ChevronLeft,
 } from 'lucide-react';
@@ -53,6 +54,11 @@ const navItems: NavItem[] = [
     icon: Activity,
   },
   {
+    title: '병원 관리',
+    href: '/accounts',
+    icon: Building2,
+  },
+  {
     title: '성과 리포트',
     href: '/outcomes',
     icon: FileText,
@@ -61,7 +67,6 @@ const navItems: NavItem[] = [
     title: '관리자',
     href: '/manager',
     icon: Users,
-    roles: [USER_ROLES.MANAGER, USER_ROLES.HEAD_MANAGER],
   },
 ];
 

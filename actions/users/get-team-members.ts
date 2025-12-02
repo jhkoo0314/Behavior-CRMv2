@@ -5,12 +5,15 @@
  * 
  * 관리자(manager, head_manager)가 팀원 목록을 조회합니다.
  * manager는 team_id 기반으로, head_manager는 모든 사용자를 조회합니다.
+ * 
+ * 시연용: 역할 체크를 비활성화하여 모든 사용자가 접근 가능합니다.
+ * 프로덕션 전환 시 requireManager() 호출을 다시 활성화해야 합니다.
  */
 
 import { auth } from '@clerk/nextjs/server';
 import { createClerkSupabaseClient } from '@/lib/supabase/server';
 import { getCurrentUserId } from '@/lib/supabase/get-user-id';
-import { requireManager } from '@/lib/auth/check-role';
+// import { requireManager } from '@/lib/auth/check-role'; // 시연용: 주석 처리
 import type { User } from '@/types/database.types';
 
 export interface GetTeamMembersInput {
@@ -22,8 +25,9 @@ export async function getTeamMembers(
   input: GetTeamMembersInput = {}
 ): Promise<{ data: User[]; totalCount: number }> {
   try {
-    // 관리자 권한 확인
-    await requireManager();
+    // 시연용: 관리자 권한 확인 비활성화
+    // 프로덕션 전환 시 아래 주석을 해제하세요:
+    // await requireManager();
 
     const { userId } = await auth();
     if (!userId) {

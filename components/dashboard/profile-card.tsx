@@ -10,17 +10,9 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getBehaviorMetrics } from '@/actions/analytics/get-behavior-metrics';
 import { useUser } from '@clerk/nextjs';
 import { ArrowUp, ArrowDown, Minus } from 'lucide-react';
-
-interface BehaviorMetrics {
-  hir: number;
-  rtr: number;
-  bcr: number;
-  phr: number;
-  totalScore: number;
-}
+import { mockCurrentMetrics, mockPreviousMetrics } from '@/lib/mock/dashboard-mock-data';
 
 function getInitials(name: string): string {
   if (!name) return 'U';
@@ -53,46 +45,24 @@ export function ProfileCard() {
   const [previousMetrics, setPreviousMetrics] = useState<BehaviorMetrics | null>(null);
 
   useEffect(() => {
-    async function fetchData() {
-      console.group('ProfileCard: 데이터 조회 시작');
-      setIsLoading(true);
-      setError(null);
+    console.group('ProfileCard: Mock 데이터 로드 시작');
+    setIsLoading(true);
+    setError(null);
 
-      try {
-        // 현재 기간 (최근 30일)
-        const endDate = new Date();
-        const startDate = new Date(endDate.getTime() - 30 * 24 * 60 * 60 * 1000);
+    try {
+      // 공통 Mock 데이터 사용
+      setMetrics(mockCurrentMetrics);
+      setPreviousMetrics(mockPreviousMetrics);
 
-        // 이전 기간 (30일 전 ~ 60일 전)
-        const previousEndDate = startDate;
-        const previousStartDate = new Date(previousEndDate.getTime() - 30 * 24 * 60 * 60 * 1000);
-
-        const [current, previous] = await Promise.all([
-          getBehaviorMetrics({
-            periodStart: startDate,
-            periodEnd: endDate,
-          }),
-          getBehaviorMetrics({
-            periodStart: previousStartDate,
-            periodEnd: previousEndDate,
-          }),
-        ]);
-
-        setMetrics(current);
-        setPreviousMetrics(previous);
-
-        console.log('현재 지표:', current);
-        console.log('이전 지표:', previous);
-      } catch (err) {
-        console.error('지표 조회 실패:', err);
-        setError(err instanceof Error ? err : new Error('데이터를 불러올 수 없습니다.'));
-      } finally {
-        setIsLoading(false);
-        console.groupEnd();
-      }
+      console.log('로드된 Mock 현재 지표:', mockCurrentMetrics);
+      console.log('로드된 Mock 이전 지표:', mockPreviousMetrics);
+    } catch (err) {
+      console.error('Mock 데이터 로드 실패:', err);
+      setError(err instanceof Error ? err : new Error('데이터를 불러올 수 없습니다.'));
+    } finally {
+      setIsLoading(false);
+      console.groupEnd();
     }
-
-    fetchData();
   }, []);
 
   if (isLoading) {

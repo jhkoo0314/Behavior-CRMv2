@@ -10,7 +10,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getBehaviorMetrics } from '@/actions/analytics/get-behavior-metrics';
+import { mockCurrentMetrics } from '@/lib/mock/dashboard-mock-data';
 
 interface BehaviorMetrics {
   hir: number;
@@ -45,38 +45,29 @@ export function BehaviorRadarChart() {
   } | null>(null);
 
   useEffect(() => {
-    async function fetchData() {
-      console.group('BehaviorRadarChart: 데이터 조회 시작');
-      setIsLoading(true);
-      setError(null);
+    console.group('BehaviorRadarChart: Mock 데이터 로드 시작');
+    setIsLoading(true);
+    setError(null);
 
-      try {
-        const endDate = new Date();
-        const startDate = new Date(endDate.getTime() - 30 * 24 * 60 * 60 * 1000);
+    try {
+      // 공통 Mock 데이터 사용 (totalScore 제외)
+      const metrics: BehaviorMetrics = {
+        hir: mockCurrentMetrics.hir,
+        rtr: mockCurrentMetrics.rtr,
+        bcr: mockCurrentMetrics.bcr,
+        phr: mockCurrentMetrics.phr,
+      };
 
-        const data = await getBehaviorMetrics({
-          periodStart: startDate,
-          periodEnd: endDate,
-        });
+      setMetrics(metrics);
 
-        setMetrics({
-          hir: data.hir,
-          rtr: data.rtr,
-          bcr: data.bcr,
-          phr: data.phr,
-        });
-
-        console.log('지표 데이터:', data);
-      } catch (err) {
-        console.error('지표 조회 실패:', err);
-        setError(err instanceof Error ? err : new Error('데이터를 불러올 수 없습니다.'));
-      } finally {
-        setIsLoading(false);
-        console.groupEnd();
-      }
+      console.log('로드된 Mock 지표 데이터:', metrics);
+    } catch (err) {
+      console.error('Mock 데이터 로드 실패:', err);
+      setError(err instanceof Error ? err : new Error('데이터를 불러올 수 없습니다.'));
+    } finally {
+      setIsLoading(false);
+      console.groupEnd();
     }
-
-    fetchData();
   }, []);
 
   useEffect(() => {

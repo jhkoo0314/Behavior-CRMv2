@@ -12,10 +12,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getNextBestActions } from '@/actions/recommendations/get-next-best-actions';
 import type { NextBestAction } from '@/lib/analytics/recommend-next-action';
 import { useRouter } from 'next/navigation';
 import { AlertCircle, AlertTriangle, Calendar } from 'lucide-react';
+import { mockNextBestActions } from '@/lib/mock/dashboard-mock-data';
 
 function getActionIcon(reason: string): { icon: React.ReactNode; bgColor: string; textColor: string } {
   const lowerReason = reason.toLowerCase();
@@ -62,25 +62,21 @@ export function ActionQueue() {
   const [actions, setActions] = useState<NextBestAction[]>([]);
 
   useEffect(() => {
-    async function fetchData() {
-      console.group('ActionQueue: 데이터 조회 시작');
-      setIsLoading(true);
-      setError(null);
+    console.group('ActionQueue: Mock 데이터 로드 시작');
+    setIsLoading(true);
+    setError(null);
 
-      try {
-        const data = await getNextBestActions({ limit: 5 });
-        console.log('조회된 추천 행동 수:', data.length);
-        setActions(data);
-      } catch (err) {
-        console.error('추천 행동 조회 실패:', err);
-        setError(err instanceof Error ? err : new Error('데이터를 불러올 수 없습니다.'));
-      } finally {
-        setIsLoading(false);
-        console.groupEnd();
-      }
+    try {
+      // 공통 Mock 데이터 사용
+      console.log('로드된 Mock 추천 행동 수:', mockNextBestActions.length);
+      setActions(mockNextBestActions);
+    } catch (err) {
+      console.error('Mock 데이터 로드 실패:', err);
+      setError(err instanceof Error ? err : new Error('데이터를 불러올 수 없습니다.'));
+    } finally {
+      setIsLoading(false);
+      console.groupEnd();
     }
-
-    fetchData();
   }, []);
 
   const handleActionClick = (action: NextBestAction) => {
