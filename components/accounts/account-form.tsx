@@ -60,8 +60,10 @@ export function AccountForm({ account, onSubmit, onCancel }: AccountFormProps) {
       ? {
           name: account.name,
           type: account.type,
-          tier: account.tier || "B", // 기본값 B
-          status: account.status || "prospect", // 기본값 가망고객
+          // RISK를 C로 매핑 (기존 데이터 호환성)
+          tier: account.tier === "RISK" ? "C" : account.tier,
+          // Account 타입에 status 필드가 없으므로 기본값 사용
+          status: "prospect",
           address: account.address || "",
           phone: account.phone || "",
           specialty: account.specialty || "",
