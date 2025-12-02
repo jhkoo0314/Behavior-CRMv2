@@ -105,7 +105,7 @@ export function BehaviorOutcomeTrendChart() {
             dataMap.set(dateKey, { behavior: [], outcome: [] });
           }
           // HIR을 성과 지표로 사용 (0-100 스케일)
-          dataMap.get(dateKey)!.outcome.push(outcome.hir || 0);
+          dataMap.get(dateKey)!.outcome.push(outcome.hir_score || 0);
         }
 
         // 최종 차트 데이터 생성

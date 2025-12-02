@@ -1,13 +1,13 @@
 /**
  * Activity 기록 페이지
- * 
+ *
  * 영업사원의 행동 데이터를 기록하고 조회하는 페이지입니다.
  */
 
-import { Suspense } from 'react';
-import { ActivitiesClient } from '@/components/activities/activities-client';
-import { getActivities } from '@/actions/activities/get-activities';
-import { getAccounts } from '@/actions/accounts/get-accounts';
+import { Suspense } from "react";
+import { ActivitiesClient } from "@/components/activities/activities-client";
+import { getActivities } from "@/actions/activities/get-activities";
+import { getAccounts } from "@/actions/accounts/get-accounts";
 
 async function ActivitiesPageContent() {
   const { data: activities } = await getActivities({ limit: 50 });
@@ -24,10 +24,7 @@ async function ActivitiesPageContent() {
         </div>
       </div>
 
-      <ActivitiesClient
-        initialActivities={activities}
-        accounts={accounts}
-      />
+      <ActivitiesClient initialActivities={activities} accounts={accounts} />
     </div>
   );
 }
