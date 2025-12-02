@@ -36,7 +36,7 @@ export function AppLayout({ children }: AppLayoutProps) {
       {/* 메인 콘텐츠 영역 */}
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <Header onMenuClick={() => setMobileMenuOpen(true)} />
-        <main className="flex-1 overflow-y-auto overflow-x-hidden bg-muted/30 p-4 lg:p-4 xl:p-6">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden bg-muted/30">
           {children}
         </main>
       </div>

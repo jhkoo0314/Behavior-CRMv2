@@ -70,7 +70,6 @@ export function ActivityForm({
   activity,
   accounts,
   onSubmit,
-  onCancel,
 }: ActivityFormProps) {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [recentAccounts, setRecentAccounts] = useState<Account[]>([]);
@@ -154,9 +153,6 @@ export function ActivityForm({
         },
   });
 
-  const outcome = form.watch('outcome');
-  const tags = form.watch('tags');
-  const sentimentScore = form.watch('sentiment_score');
 
   // 진행률 계산 (33%, 66%, 100%)
   const progress = useMemo(() => {
@@ -434,7 +430,7 @@ export function ActivityForm({
                 <p className="text-xs text-muted-foreground m-0">
                   <strong className="font-semibold">💡 Logic-Driven Tip:</strong>
                   <br />
-                  '부정 태그' 선택 후 '높은 점수'를 입력하면 서버 로직에 의해 재검증 대상이
+                  &apos;부정 태그&apos; 선택 후 &apos;높은 점수&apos;를 입력하면 서버 로직에 의해 재검증 대상이
                   됩니다.
                 </p>
               </div>
@@ -489,7 +485,7 @@ export function ActivityForm({
                       <Input type="date" {...field} />
                     </FormControl>
                     <p className="text-xs text-red-600 mt-1">
-                      * 미입력 시 'Dead Lead'로 분류되어 PHR 점수가 하락합니다.
+                      * 미입력 시 &apos;Dead Lead&apos;로 분류되어 PHR 점수가 하락합니다.
                     </p>
                     <FormMessage />
                   </FormItem>

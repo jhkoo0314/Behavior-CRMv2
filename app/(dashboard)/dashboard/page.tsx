@@ -57,7 +57,7 @@ export default function DashboardPage() {
   const userName = user?.fullName || user?.firstName || "사용자";
 
   return (
-    <div className="min-w-0 w-full space-y-6">
+    <div className="min-w-0 w-full max-w-[1400px] mx-auto px-5 py-6 space-y-6">
       {/* 헤더 */}
       <div className="flex justify-between items-end">
         <div>
