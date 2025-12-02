@@ -40,7 +40,7 @@ async function ActivitiesPageContent() {
   }
 
   return (
-    <div className="min-w-0 w-full max-w-3xl mx-auto px-4 space-y-6">
+    <div className="min-w-0 w-full max-w-[1200px] mx-auto px-5 space-y-6">
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div>

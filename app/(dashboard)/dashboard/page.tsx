@@ -47,7 +47,7 @@ function DashboardSkeleton() {
 
 export default function DashboardPage() {
   return (
-    <div className="min-w-0 w-full max-w-[1400px] mx-auto px-5 pt-1 pb-6">
+    <div className="min-w-0 w-full max-w-[1200px] mx-auto px-5 pt-1 pb-6">
       {/* 메인 그리드 */}
       <Suspense fallback={<DashboardSkeleton />}>
         <div
