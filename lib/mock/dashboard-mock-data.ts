@@ -71,13 +71,15 @@ export const mockTeamMembersScatterData = [
 /**
  * 액션 큐용 추천 행동 데이터
  */
-export const mockNextBestActions = [
+import type { NextBestAction } from '@/lib/analytics/recommend-next-action';
+
+export const mockNextBestActions: NextBestAction[] = [
   {
     account_id: 'mock-account-1',
     account_name: '서울대학교병원',
     contact_id: 'mock-contact-1',
     contact_name: '김과장',
-    recommended_behavior: 'visit' as const,
+    recommended_behavior: 'visit',
     reason: 'PHR 점수가 낮습니다. 최근 접촉이 없어 관계가 소원해질 위험이 있습니다.',
     priority: 95,
   },
@@ -86,7 +88,7 @@ export const mockNextBestActions = [
     account_name: '세브란스병원',
     contact_id: 'mock-contact-2',
     contact_name: '이부장',
-    recommended_behavior: 'call' as const,
+    recommended_behavior: 'contact',
     reason: 'RTR 점수가 하락했습니다. 긍정적인 태그 활동을 늘려 관계를 개선하세요.',
     priority: 85,
   },
@@ -95,7 +97,7 @@ export const mockNextBestActions = [
     account_name: '아산병원',
     contact_id: 'mock-contact-3',
     contact_name: '박팀장',
-    recommended_behavior: 'proposal' as const,
+    recommended_behavior: 'presentation',
     reason: 'BCR 루틴 점수가 낮습니다. 규칙적인 활동 패턴을 유지해보세요.',
     priority: 75,
   },
@@ -104,7 +106,7 @@ export const mockNextBestActions = [
     account_name: '삼성서울병원',
     contact_id: 'mock-contact-4',
     contact_name: '최대리',
-    recommended_behavior: 'visit' as const,
+    recommended_behavior: 'visit',
     reason: 'HIR 정직입력 점수를 높이기 위해 활동 기록을 정확히 입력하세요.',
     priority: 70,
   },
@@ -113,7 +115,7 @@ export const mockNextBestActions = [
     account_name: '가톨릭의대',
     contact_id: 'mock-contact-5',
     contact_name: '정과장',
-    recommended_behavior: 'call' as const,
+    recommended_behavior: 'contact',
     reason: 'PHR 관리 점수가 낮습니다. 다음 활동 예정일을 설정하여 관리하세요.',
     priority: 65,
   },

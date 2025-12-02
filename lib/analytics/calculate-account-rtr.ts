@@ -40,8 +40,7 @@ export async function calculateAccountRTR(
 
     // Activity 조회 (해당 account만)
     const { data: activities } = await getActivities({
-      accountId,
-      userId,
+      account_id: accountId,
       startDate,
       endDate,
     });

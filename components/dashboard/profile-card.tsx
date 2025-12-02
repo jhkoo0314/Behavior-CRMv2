@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useUser } from '@clerk/nextjs';
 import { ArrowUp, ArrowDown, Minus } from 'lucide-react';
-import { mockCurrentMetrics, mockPreviousMetrics } from '@/lib/mock/dashboard-mock-data';
+import { mockCurrentMetrics, mockPreviousMetrics, type BehaviorMetrics } from '@/lib/mock/dashboard-mock-data';
 
 function getInitials(name: string): string {
   if (!name) return 'U';

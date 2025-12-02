@@ -25,7 +25,7 @@ export async function getLastVisitDate(
   try {
     // 최근 방문 활동 조회 (최대 1개)
     const { data: activities } = await getActivities({
-      accountId,
+      account_id: accountId,
       limit: 1,
     });
 

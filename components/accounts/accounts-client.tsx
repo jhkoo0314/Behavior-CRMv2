@@ -59,10 +59,8 @@ export function AccountsClient({
         address: data.address,
         phone: data.phone,
         specialty: data.specialty,
-        patient_count: data.patient_count,
-        revenue: data.revenue,
         notes: data.notes,
-        tier: (data as any).tier || 'B', // TODO: AccountForm에 tier 추가 후 타입 수정
+        tier: data.tier === 'C' ? 'RISK' : data.tier, // C를 RISK로 변환 (DB 호환성)
       });
 
       // Mock 데이터 형식으로 변환 (실제로는 Server Action에서 반환)
@@ -92,7 +90,7 @@ export function AccountsClient({
       const updatedAccount = await updateAccount({
         id: editingAccount.id,
         ...data,
-        tier: (data as any).tier || editingAccount.tier, // TODO: AccountForm에 tier 추가 후 타입 수정
+        tier: data.tier === 'C' ? 'RISK' : data.tier, // C를 RISK로 변환 (DB 호환성)
       });
 
       // Mock 데이터 형식으로 변환
