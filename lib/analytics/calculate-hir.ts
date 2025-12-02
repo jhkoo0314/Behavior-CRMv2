@@ -9,6 +9,8 @@
  * - 0-100 스케일로 정규화
  */
 
+'use server';
+
 import { createClerkSupabaseClient } from '@/lib/supabase/server';
 import type { BehaviorScore } from '@/types/database.types';
 import { BEHAVIOR_TYPE_LIST } from '@/constants/behavior-types';

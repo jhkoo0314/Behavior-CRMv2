@@ -20,9 +20,6 @@ import {
   ReferenceArea,
 } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { getBehaviorScoresTrend } from '@/actions/behavior-scores/get-behavior-scores-trend';
-import { getOutcomes } from '@/actions/outcomes/get-outcomes';
-import { calculatePeriod } from '@/lib/utils/chart-data';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface TrendDataPoint {
@@ -41,132 +38,122 @@ export function BehaviorOutcomeTrendChart() {
   } | null>(null);
 
   useEffect(() => {
-    async function fetchData() {
-      console.group('BehaviorOutcomeTrendChart: 데이터 조회 시작');
+    function generateMockData() {
+      console.group('BehaviorOutcomeTrendChart: Mock 데이터 생성 시작');
       setIsLoading(true);
       setError(null);
 
       try {
-        const period = 90; // 90일 기간 사용
-        const { start, end } = calculatePeriod(period);
-        console.log('기간:', period, '일');
-        console.log('시작일:', start);
-        console.log('종료일:', end);
+        // 최근 12주간의 mock 데이터 생성
+        const weeks = 12;
+        const mockData: TrendDataPoint[] = [];
+        const today = new Date();
+        
+        // 행동 품질: 초기값 45점에서 시작하여 점진적으로 상승 (약간의 변동 포함)
+        const behaviorBase = 45;
+        // 성과: 행동보다 약 2주 지연된 패턴으로 상승
+        const outcomeBase = 40;
 
-        // 행동 데이터 조회
-        const behaviorData = await getBehaviorScoresTrend({
-          periodStart: start,
-          periodEnd: end,
-          groupBy: 'week', // 주별 집계
-        });
-        console.log('행동 데이터:', behaviorData.length, '개');
+        // 1단계: 먼저 행동 데이터만 생성
+        const behaviorValues: number[] = [];
+        const dates: string[] = [];
 
-        // 성과 데이터 조회
-        const { data: outcomes } = await getOutcomes({
-          periodStart: start,
-          periodEnd: end,
-          accountId: null, // 전체 통계
-          periodType: 'weekly',
-        });
-        console.log('성과 데이터:', outcomes.length, '개');
-
-        // 데이터 병합: 날짜 기준으로 행동과 성과를 합침
-        const dataMap = new Map<string, { behavior: number[]; outcome: number[] }>();
-
-        // 행동 데이터 처리: 8개 지표의 평균 계산
-        for (const item of behaviorData) {
-          const dateKey = item.date;
-          const behaviorAvg =
-            (item.approach +
-              item.contact +
-              item.visit +
-              item.presentation +
-              item.question +
-              item.need_creation +
-              item.demonstration +
-              item.follow_up) /
-            8;
-
-          if (!dataMap.has(dateKey)) {
-            dataMap.set(dateKey, { behavior: [], outcome: [] });
-          }
-          dataMap.get(dateKey)!.behavior.push(behaviorAvg);
-        }
-
-        // 성과 데이터 처리: HIR 사용 (또는 처방지수)
-        for (const outcome of outcomes) {
-          const periodStartDate = new Date(outcome.period_start);
-          const dayOfWeek = periodStartDate.getDay();
-          const monday = new Date(periodStartDate);
-          monday.setDate(periodStartDate.getDate() - dayOfWeek + 1);
+        for (let i = weeks - 1; i >= 0; i--) {
+          const date = new Date(today);
+          date.setDate(today.getDate() - (i * 7));
+          
+          // 매주 월요일로 정규화
+          const dayOfWeek = date.getDay();
+          const monday = new Date(date);
+          monday.setDate(date.getDate() - dayOfWeek + 1);
           const dateKey = monday.toISOString().split('T')[0];
+          dates.push(dateKey);
 
-          if (!dataMap.has(dateKey)) {
-            dataMap.set(dateKey, { behavior: [], outcome: [] });
+          // 행동 품질: 점진적 상승 + 약간의 랜덤 변동
+          // 초반에는 느리게 상승, 중반부터 가속, 후반에는 안정화
+          const progress = (weeks - i) / weeks;
+          let behaviorTrend = 0;
+          
+          if (progress < 0.3) {
+            // 초반 30%: 느린 상승
+            behaviorTrend = behaviorBase + (progress * 0.3) * 15 + (Math.random() - 0.5) * 3;
+          } else if (progress < 0.7) {
+            // 중반 40%: 빠른 상승 (가속 구간)
+            behaviorTrend = behaviorBase + 4.5 + ((progress - 0.3) * 0.4) * 25 + (Math.random() - 0.5) * 4;
+          } else {
+            // 후반 30%: 안정화 (약간의 변동)
+            behaviorTrend = behaviorBase + 14.5 + ((progress - 0.7) * 0.3) * 10 + (Math.random() - 0.5) * 2;
           }
-          // HIR을 성과 지표로 사용 (0-100 스케일)
-          dataMap.get(dateKey)!.outcome.push(outcome.hir_score || 0);
+          
+          behaviorTrend = Math.max(30, Math.min(95, behaviorTrend)); // 30-95 범위로 제한
+          behaviorValues.push(Math.round(behaviorTrend * 10) / 10);
         }
 
-        // 최종 차트 데이터 생성
-        const mergedData: TrendDataPoint[] = [];
-        for (const [date, values] of dataMap.entries()) {
-          const behaviorAvg =
-            values.behavior.length > 0
-              ? values.behavior.reduce((a, b) => a + b, 0) / values.behavior.length
-              : 0;
-          const outcomeAvg =
-            values.outcome.length > 0
-              ? values.outcome.reduce((a, b) => a + b, 0) / values.outcome.length
-              : 0;
+        // 2단계: 성과 데이터 생성 (행동 데이터를 참조하여 2주 지연 효과 적용)
+        for (let i = 0; i < weeks; i++) {
+          let outcomeTrend = 0;
+          
+          if (i >= 2) {
+            // 2주 전 행동 데이터를 참조 (지연 효과)
+            const behavior2WeeksAgo = behaviorValues[i - 2];
+            outcomeTrend = behavior2WeeksAgo * 0.85 + (Math.random() - 0.5) * 5; // 약간의 변동
+          } else {
+            // 초기 2주는 기본값 사용
+            outcomeTrend = outcomeBase + (Math.random() - 0.5) * 5;
+          }
+          
+          outcomeTrend = Math.max(25, Math.min(90, outcomeTrend)); // 25-90 범위로 제한
 
-          mergedData.push({
-            date,
-            behavior: Math.round(behaviorAvg * 10) / 10,
-            outcome: Math.round(outcomeAvg * 10) / 10,
+          mockData.push({
+            date: dates[i],
+            behavior: behaviorValues[i],
+            outcome: Math.round(outcomeTrend * 10) / 10,
           });
         }
 
-        // 날짜순 정렬
-        mergedData.sort((a, b) => a.date.localeCompare(b.date));
+        console.log('생성된 Mock 데이터:', mockData.length, '개');
+        console.log('샘플 데이터:', mockData.slice(0, 3));
+        console.log('전체 데이터:', mockData);
 
-        console.log('병합된 데이터:', mergedData.length, '개');
-        console.log('샘플 데이터:', mergedData.slice(0, 3));
+        setChartData(mockData);
 
-        setChartData(mergedData);
-
-        // Lagging Effect 영역 찾기: 행동이 상승한 지점에서 2주 후 영역
-        if (mergedData.length > 4) {
-          // 간단한 로직: 행동이 상승한 구간 찾기
+        // Lagging Effect 영역 찾기: 행동이 가장 크게 상승한 지점에서 2주 후 영역
+        if (mockData.length > 4) {
           let maxBehaviorIncrease = 0;
           let increaseIndex = -1;
-          for (let i = 1; i < mergedData.length - 2; i++) {
-            const increase = mergedData[i].behavior - mergedData[i - 1].behavior;
+          
+          for (let i = 1; i < mockData.length - 2; i++) {
+            const increase = mockData[i].behavior - mockData[i - 1].behavior;
             if (increase > maxBehaviorIncrease) {
               maxBehaviorIncrease = increase;
               increaseIndex = i;
             }
           }
 
-          if (increaseIndex > 0 && increaseIndex < mergedData.length - 2) {
+          if (increaseIndex > 0 && increaseIndex < mockData.length - 2) {
             // 행동 상승 지점에서 2주 후 (약 2개 데이터 포인트)
             setLaggingArea({
-              start: increaseIndex,
-              end: Math.min(increaseIndex + 2, mergedData.length - 1),
+              start: increaseIndex + 2, // 행동 상승 후 2주
+              end: Math.min(increaseIndex + 4, mockData.length - 1),
             });
-            console.log('Lagging Effect 영역:', increaseIndex, '~', increaseIndex + 2);
+            console.log('Lagging Effect 영역:', increaseIndex + 2, '~', Math.min(increaseIndex + 4, mockData.length - 1));
           }
         }
       } catch (err) {
-        console.error('트렌드 데이터 조회 실패:', err);
-        setError(err instanceof Error ? err : new Error('데이터를 불러올 수 없습니다.'));
+        console.error('Mock 데이터 생성 실패:', err);
+        setError(err instanceof Error ? err : new Error('데이터를 생성할 수 없습니다.'));
       } finally {
         setIsLoading(false);
         console.groupEnd();
       }
     }
 
-    fetchData();
+    // 약간의 지연을 주어 로딩 상태를 보여줌
+    const timer = setTimeout(() => {
+      generateMockData();
+    }, 500);
+
+    return () => clearTimeout(timer);
   }, []);
 
   if (isLoading) {

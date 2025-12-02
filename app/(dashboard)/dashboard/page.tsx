@@ -48,6 +48,12 @@ function DashboardSkeleton() {
 export default function DashboardPage() {
   return (
     <div className="min-w-0 w-full max-w-[1200px] mx-auto px-5 pt-1 pb-6">
+      {/* 헤더 */}
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold">Action Hub</h1>
+        <p className="text-muted-foreground mt-1">행동 데이터 기반 대시보드</p>
+      </div>
+
       {/* 메인 그리드 */}
       <Suspense fallback={<DashboardSkeleton />}>
         <div

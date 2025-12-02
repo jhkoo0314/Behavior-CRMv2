@@ -85,8 +85,15 @@ export default async function Home() {
   }
 
   // Clerk에서 사용자 정보 가져오기
-  const client = await clerkClient();
-  const clerkUser = await client.users.getUser(userId);
+  let clerkUser;
+  try {
+    const client = await clerkClient();
+    clerkUser = await client.users.getUser(userId);
+  } catch (error) {
+    console.error('Clerk 사용자 정보 조회 실패:', error);
+    // Clerk 조회 실패 시 로그아웃 처리
+    redirect("/sign-in");
+  }
 
   let userName = "사용자";
   let userInitials = "U";
@@ -123,29 +130,35 @@ export default async function Home() {
   }
 
   // HIR 지수 계산 (최근 30일)
-  const userUuid = await getCurrentUserId();
   let hirScore = 0;
   let hirChange = 0;
   let goalAchievement = 82;
 
-  if (userUuid) {
-    try {
-      const periodEnd = new Date();
-      const periodStart = new Date();
-      periodStart.setDate(periodStart.getDate() - 30);
+  try {
+    const userUuid = await getCurrentUserId();
+    
+    if (userUuid) {
+      try {
+        const periodEnd = new Date();
+        const periodStart = new Date();
+        periodStart.setDate(periodStart.getDate() - 30);
 
-      hirScore = await calculateHIR(userUuid, periodStart, periodEnd);
+        hirScore = await calculateHIR(userUuid, periodStart, periodEnd);
 
-      // 이전 기간과 비교 (간단히 더미 데이터 사용)
-      // 실제로는 이전 기간의 HIR을 계산하여 비교해야 함
-      hirChange = 12.5; // 더미 데이터
+        // 이전 기간과 비교 (간단히 더미 데이터 사용)
+        // 실제로는 이전 기간의 HIR을 계산하여 비교해야 함
+        hirChange = 12.5; // 더미 데이터
 
-      // Goal Achievement는 HIR 기반으로 계산 (간단한 예시)
-      goalAchievement = Math.min(100, Math.round((hirScore / 100) * 100));
-    } catch (error) {
-      console.error("HIR 계산 실패:", error);
-      // 에러 발생 시 기본값 사용
+        // Goal Achievement는 HIR 기반으로 계산 (간단한 예시)
+        goalAchievement = Math.min(100, Math.round((hirScore / 100) * 100));
+      } catch (error) {
+        console.error("HIR 계산 실패:", error);
+        // 에러 발생 시 기본값 사용
+      }
     }
+  } catch (error) {
+    console.error("사용자 ID 조회 실패:", error);
+    // 사용자 ID 조회 실패 시 기본값 사용 (로그아웃 상태일 수 있음)
   }
 
   return (

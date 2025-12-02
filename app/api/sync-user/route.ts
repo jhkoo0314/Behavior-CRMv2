@@ -38,11 +38,28 @@ export async function POST() {
       );
     }
 
-    // Clerk 메타데이터에서 role 읽기 (없으면 기본값 'salesperson')
-    const role =
-      (clerkUser.publicMetadata?.role as string) ||
-      (clerkUser.privateMetadata?.role as string) ||
-      'salesperson';
+    // Supabase에서 기존 사용자 정보 조회 (role 확인용)
+    const supabase = getServiceRoleClient();
+    const { data: existingUser } = await supabase
+      .from('users')
+      .select('role')
+      .eq('clerk_id', userId)
+      .single();
+
+    // Supabase에 이미 role이 있으면 그것을 사용, 없으면 Clerk 메타데이터에서 읽기
+    let role: string;
+    if (existingUser?.role) {
+      // Supabase에 이미 role이 있으면 그것을 우선 사용
+      role = existingUser.role;
+      console.log('📌 기존 Supabase role 사용:', role);
+    } else {
+      // Supabase에 role이 없으면 Clerk 메타데이터에서 읽기 (없으면 기본값 'salesperson')
+      role =
+        (clerkUser.publicMetadata?.role as string) ||
+        (clerkUser.privateMetadata?.role as string) ||
+        'salesperson';
+      console.log('📌 Clerk 메타데이터에서 role 읽기:', role);
+    }
 
     // role 유효성 검증
     const validRoles = ['salesperson', 'manager', 'head_manager'];
@@ -58,7 +75,7 @@ export async function POST() {
       team_id: (clerkUser.publicMetadata?.team_id as string) || null,
     });
 
-    const supabase = getServiceRoleClient();
+    // supabase는 위에서 이미 생성됨
     console.log("✅ Service Role 클라이언트 생성 완료");
 
     const { data, error } = await supabase
