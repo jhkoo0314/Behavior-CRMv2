@@ -28,7 +28,7 @@ export function RiskAlertBanner({ alerts, onViewRisk }: RiskAlertBannerProps) {
       <span className="text-lg">🚨</span>
       <div className="flex-1">
         <span className="text-sm font-semibold text-red-800">
-          주의: '{primaryAlert.accountName}'
+          주의: &apos;{primaryAlert.accountName}&apos;
           {additionalCount > 0 && ` 외 ${additionalCount}곳`}의 관계 온도가 급격히 하락했습니다.
         </span>
       </div>

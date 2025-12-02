@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
 /**
- * Account 입력 폼 컴포넌트
- * 
- * 병원 정보를 입력하고 수정하는 폼입니다.
+ * Strategy-First Account Form
+ *
+ * 단순 정보 입력이 아닌, 영업 전략(Tier, Status)을 함께 수립하는 폼입니다.
  */
 
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { Button } from '@/components/ui/button';
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -17,35 +17,32 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import type { Account } from '@/types/database.types';
+} from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import type { Account } from "@/types/database.types";
 
+// --- Schema Definition ---
 const accountFormSchema = z.object({
-  name: z
-    .string()
-    .min(1, '병원명을 입력해주세요')
-    .max(200, '병원명은 200자 이하여야 합니다'),
-  address: z.string().max(500, '주소는 500자 이하여야 합니다').optional(),
-  phone: z
-    .string()
-    .regex(/^[0-9-]+$/, '전화번호는 숫자와 하이픈만 사용할 수 있습니다')
-    .max(20, '전화번호는 20자 이하여야 합니다')
-    .optional(),
-  type: z.enum(['general_hospital', 'hospital', 'clinic', 'pharmacy']),
-  specialty: z.string().max(100, '진료과는 100자 이하여야 합니다').optional(),
-  patient_count: z.number().int().min(0).max(10000000).optional(),
-  revenue: z.number().int().min(0).max(1000000000000).optional(),
-  notes: z.string().max(2000, '메모는 2000자 이하여야 합니다').optional(),
-  tier: z.enum(['S', 'A', 'B', 'RISK']).default('B'),
+  name: z.string().min(1, "병원명을 입력해주세요"),
+  type: z.enum(["general_hospital", "hospital", "clinic", "pharmacy"]),
+
+  // 전략적 필드 추가
+  tier: z.enum(["S", "A", "B", "C"]),
+  status: z.enum(["active", "churned", "prospect"]),
+
+  address: z.string().optional(),
+  phone: z.string().optional(),
+  specialty: z.string().optional(),
+  notes: z.string().optional(),
 });
 
 export type AccountFormData = z.infer<typeof accountFormSchema>;
@@ -56,218 +53,165 @@ interface AccountFormProps {
   onCancel?: () => void;
 }
 
-const ACCOUNT_TYPE_LABELS: Record<
-  'general_hospital' | 'hospital' | 'clinic' | 'pharmacy',
-  string
-> = {
-  general_hospital: '종합병원',
-  hospital: '병원',
-  clinic: '의원',
-  pharmacy: '약국',
-};
-
-const TIER_LABELS: Record<'S' | 'A' | 'B' | 'RISK', string> = {
-  S: 'S-Tier (핵심)',
-  A: 'A-Tier (주요)',
-  B: 'B-Tier (일반)',
-  RISK: 'RISK (이탈 위험)',
-};
-
 export function AccountForm({ account, onSubmit, onCancel }: AccountFormProps) {
   const form = useForm<AccountFormData>({
     resolver: zodResolver(accountFormSchema),
     defaultValues: account
       ? {
           name: account.name,
-          address: account.address || '',
-          phone: account.phone || '',
           type: account.type,
-          specialty: account.specialty || '',
-          patient_count: account.patient_count || 0,
-          revenue: account.revenue || 0,
-          notes: account.notes || '',
-          tier: account.tier || 'B',
+          tier: account.tier || "B", // 기본값 B
+          status: account.status || "prospect", // 기본값 가망고객
+          address: account.address || "",
+          phone: account.phone || "",
+          specialty: account.specialty || "",
+          notes: account.notes || "",
         }
       : {
-          name: '',
-          address: '',
-          phone: '',
-          type: 'clinic',
-          specialty: '',
-          patient_count: 0,
-          revenue: 0,
-          notes: '',
-          tier: 'B',
+          name: "",
+          type: "clinic",
+          tier: "B",
+          status: "prospect",
+          address: "",
+          phone: "",
+          specialty: "",
+          notes: "",
         },
   });
 
-  const handleSubmit = async (data: AccountFormData) => {
-    console.group('AccountForm: 제출');
-    console.log('폼 데이터:', data);
-    await onSubmit(data);
-    console.groupEnd();
-  };
-
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>병원명 *</FormLabel>
-              <FormControl>
-                <Input {...field} placeholder="병원명을 입력하세요" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {/* 1. 기본 정보 */}
+        <div className="space-y-4">
+          <h3 className="text-sm font-semibold text-muted-foreground">
+            기본 정보
+          </h3>
+          <div className="grid grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem className="col-span-2">
+                  <FormLabel>병원명 *</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="예: 서울대학교병원" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <FormField
-          control={form.control}
-          name="type"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>병원 타입 *</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-                value={field.value}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="병원 타입을 선택하세요" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {Object.entries(ACCOUNT_TYPE_LABELS).map(([value, label]) => (
-                    <SelectItem key={value} value={value}>
-                      {label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+            <FormField
+              control={form.control}
+              name="type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>유형</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="유형 선택" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="general_hospital">종합병원</SelectItem>
+                      <SelectItem value="hospital">병원</SelectItem>
+                      <SelectItem value="clinic">의원</SelectItem>
+                      <SelectItem value="pharmacy">약국</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="specialty"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>진료과</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="예: 순환기내과" />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
 
-        <FormField
-          control={form.control}
-          name="tier"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>중요도 등급 (Tier) *</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-                value={field.value}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="중요도 등급을 선택하세요" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {Object.entries(TIER_LABELS).map(([value, label]) => (
-                    <SelectItem key={value} value={value}>
-                      {label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="address"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>주소</FormLabel>
-              <FormControl>
-                <Input {...field} placeholder="주소를 입력하세요" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="phone"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>전화번호</FormLabel>
-              <FormControl>
-                <Input {...field} placeholder="전화번호를 입력하세요" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="specialty"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>진료과</FormLabel>
-              <FormControl>
-                <Input {...field} placeholder="진료과를 입력하세요" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="patient_count"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>환자 수</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    {...field}
-                    value={field.value || ''}
-                    onChange={(e) =>
-                      field.onChange(
-                        e.target.value ? parseInt(e.target.value, 10) : 0
-                      )
-                    }
-                    placeholder="0"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        {/* 2. 전략적 분류 (핵심) */}
+        <div className="space-y-4 border-t pt-4">
+          <h3 className="text-sm font-semibold text-muted-foreground">
+            전략적 분류
+          </h3>
 
           <FormField
             control={form.control}
-            name="revenue"
+            name="tier"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>매출 (원)</FormLabel>
+              <FormItem className="space-y-3">
+                <FormLabel>중요도 등급 (Tier)</FormLabel>
                 <FormControl>
-                  <Input
-                    type="number"
-                    {...field}
-                    value={field.value || ''}
-                    onChange={(e) =>
-                      field.onChange(
-                        e.target.value ? parseInt(e.target.value, 10) : 0
-                      )
-                    }
-                    placeholder="0"
-                  />
+                  <RadioGroup
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    className="flex space-x-4"
+                  >
+                    {[
+                      {
+                        val: "S",
+                        label: "S (핵심)",
+                        desc: "매출 50% 이상 점유",
+                        color:
+                          "bg-indigo-100 text-indigo-700 border-indigo-200",
+                      },
+                      {
+                        val: "A",
+                        label: "A (주력)",
+                        desc: "성장 가능성 높음",
+                        color: "bg-blue-50 text-blue-700 border-blue-200",
+                      },
+                      {
+                        val: "B",
+                        label: "B (일반)",
+                        desc: "유지 관리",
+                        color: "bg-gray-50 text-gray-700 border-gray-200",
+                      },
+                      {
+                        val: "C",
+                        label: "C (잠재)",
+                        desc: "신규 발굴",
+                        color: "bg-slate-50 text-slate-500 border-slate-200",
+                      },
+                    ].map((item) => (
+                      <FormItem
+                        key={item.val}
+                        className="flex items-center space-x-0 space-y-0"
+                      >
+                        <FormControl>
+                          <RadioGroupItem
+                            value={item.val}
+                            className="peer sr-only"
+                          />
+                        </FormControl>
+                        <FormLabel
+                          className={`
+                          flex flex-col items-center justify-center w-24 p-2 rounded-lg border-2 cursor-pointer transition-all
+                          hover:bg-accent peer-data-[state=checked]:border-primary peer-data-[state=checked]:ring-1 peer-data-[state=checked]:ring-primary
+                          ${item.color}
+                        `}
+                        >
+                          <span className="text-lg font-bold">{item.val}</span>
+                          <span className="text-xs opacity-70">
+                            {item.desc}
+                          </span>
+                        </FormLabel>
+                      </FormItem>
+                    ))}
+                  </RadioGroup>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -275,40 +219,51 @@ export function AccountForm({ account, onSubmit, onCancel }: AccountFormProps) {
           />
         </div>
 
-        <FormField
-          control={form.control}
-          name="notes"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>메모</FormLabel>
-              <FormControl>
-                <Textarea
-                  {...field}
-                  placeholder="병원에 대한 추가 정보를 입력하세요"
-                  rows={3}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {/* 3. 상세 정보 */}
+        <div className="space-y-4 border-t pt-4">
+          <h3 className="text-sm font-semibold text-muted-foreground">
+            상세 정보
+          </h3>
+          <FormField
+            control={form.control}
+            name="address"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>주소</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="notes"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>전략 메모</FormLabel>
+                <FormControl>
+                  <Textarea
+                    {...field}
+                    placeholder="영업 전략이나 특이사항을 기록하세요."
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+        </div>
 
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-end gap-2 pt-4">
           {onCancel && (
             <Button type="button" variant="outline" onClick={onCancel}>
               취소
             </Button>
           )}
           <Button type="submit" disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting
-              ? '저장 중...'
-              : account
-                ? '수정'
-                : '생성'}
+            {form.formState.isSubmitting ? "저장 중..." : "저장하기"}
           </Button>
         </div>
       </form>
     </Form>
   );
 }
-
