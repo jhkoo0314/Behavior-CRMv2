@@ -10,7 +10,7 @@
 import { useState } from 'react';
 import { Sidebar } from './sidebar';
 import { Header } from './header';
-import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -30,6 +30,7 @@ export function AppLayout({ children }: AppLayoutProps) {
       {/* 모바일 사이드바 (Sheet) */}
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <SheetContent side="left" className="w-64 p-0">
+          <SheetTitle className="sr-only">메뉴</SheetTitle>
           <Sidebar isOpen={true} onToggle={() => setMobileMenuOpen(false)} />
         </SheetContent>
       </Sheet>

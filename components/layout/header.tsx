@@ -2,23 +2,15 @@
  * 헤더 컴포넌트
  * 
  * 사용자 프로필 드롭다운, 알림 아이콘, 모바일 메뉴 토글 버튼 포함
+ * 발표용: Mock 사용자 데이터 사용
  */
 
 'use client';
 
 import { useState, useEffect } from 'react';
-import { UserButton, useUser } from '@clerk/nextjs';
 import { Bell, Menu, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 
 interface HeaderProps {
   onMenuClick?: () => void;
@@ -26,7 +18,6 @@ interface HeaderProps {
 
 export function Header({ onMenuClick }: HeaderProps) {
   const [isMounted, setIsMounted] = useState(false);
-  const { user, isLoaded } = useUser();
   const router = useRouter();
 
   // 클라이언트에서만 렌더링하도록 처리 (Hydration 에러 방지)
@@ -34,7 +25,8 @@ export function Header({ onMenuClick }: HeaderProps) {
     setIsMounted(true);
   }, []);
 
-  const userName = isLoaded && user ? (user.fullName || user.firstName || "사용자") : "사용자";
+  // Mock 사용자 이름 사용
+  const userName = "시연 사용자";
 
   const handleRefresh = () => {
     router.refresh();
@@ -90,16 +82,7 @@ export function Header({ onMenuClick }: HeaderProps) {
           {/* <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-destructive" /> */}
         </Button>
 
-        {/* 사용자 프로필 - 클라이언트에서만 렌더링 */}
-        {isMounted && (
-          <UserButton
-            appearance={{
-              elements: {
-                avatarBox: 'h-8 w-8',
-              },
-            }}
-          />
-        )}
+        {/* 사용자 프로필 - 발표용으로 제거됨 */}
       </div>
     </header>
   );

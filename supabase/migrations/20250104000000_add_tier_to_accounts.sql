@@ -22,3 +22,6 @@ CREATE INDEX idx_accounts_tier ON accounts(tier);
 -- 코멘트 추가
 COMMENT ON COLUMN accounts.tier IS '계정 중요도 등급 (S: 핵심, A: 주요, B: 일반, RISK: 이탈 위험)';
 
+
+
+

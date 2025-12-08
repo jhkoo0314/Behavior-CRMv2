@@ -10,7 +10,6 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useUser } from '@clerk/nextjs';
 import { ArrowUp, ArrowDown, Minus } from 'lucide-react';
 import { mockCurrentMetrics, mockPreviousMetrics, type BehaviorMetrics } from '@/lib/mock/dashboard-mock-data';
 
@@ -38,7 +37,6 @@ function getRankBadge(totalScore: number): { text: string; className: string } {
 }
 
 export function ProfileCard() {
-  const { user } = useUser();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [metrics, setMetrics] = useState<BehaviorMetrics | null>(null);
@@ -101,7 +99,8 @@ export function ProfileCard() {
     );
   }
 
-  const userName = user?.fullName || user?.firstName || '사용자';
+  // Mock 사용자 이름 사용
+  const userName = '시연 사용자';
   const userInitials = getInitials(userName);
   const rankBadge = getRankBadge(metrics.totalScore);
 

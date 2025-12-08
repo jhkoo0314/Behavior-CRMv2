@@ -7,23 +7,16 @@
  * 이 컴포넌트는 모든 페이지 상단에 표시되는 헤더입니다.
  * 주요 기능:
  * 1. 로고 및 플랫폼 설명
- * 2. 사용자 프로필 정보 표시 (인증된 경우)
+ * 2. 사용자 프로필 정보 표시 (Mock 데이터 사용)
  *
  * 핵심 구현 로직:
  * - 클라이언트 컴포넌트로 구현하여 경로 확인 및 조건부 렌더링
- * - Clerk useUser 훅으로 사용자 정보 조회
  * - 대시보드 경로에서는 자동으로 숨김
- *
- * @dependencies
- * - @clerk/nextjs: useUser 훅
- * - @/lib/supabase/clerk-client: Supabase 클라이언트
+ * - 발표용: Mock 사용자 데이터 사용
  */
 
-import { useUser } from '@clerk/nextjs';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useClerkSupabaseClient } from '@/lib/supabase/clerk-client';
 import { UserProfile } from '@/components/UserProfile';
 
 // 사용자 이니셜 생성 함수
@@ -37,10 +30,7 @@ function getInitials(name: string): string {
 }
 
 export default function Navbar() {
-  const { user, isLoaded } = useUser();
   const pathname = usePathname();
-  const supabase = useClerkSupabaseClient();
-  const [department, setDepartment] = useState<string>('영업팀');
 
   // 대시보드 관련 경로에서는 Navbar 숨김
   const isDashboardRoute =
@@ -53,42 +43,16 @@ export default function Navbar() {
     pathname?.startsWith('/manager') ||
     pathname?.startsWith('/outcomes');
 
-  // 부서 정보 가져오기
-  useEffect(() => {
-    if (!isLoaded || !user) return;
-
-    const fetchDepartment = async () => {
-      try {
-        const { data: userData } = await supabase
-          .from('users')
-          .select('role, team_id')
-          .eq('clerk_id', user.id)
-          .single();
-
-        if (userData) {
-          if (userData.role === 'manager' || userData.role === 'head_manager') {
-            setDepartment('관리팀');
-          }
-        }
-      } catch (error) {
-        console.error('부서 정보 조회 실패:', error);
-      }
-    };
-
-    fetchDepartment();
-  }, [isLoaded, user, supabase]);
-
   // 대시보드 경로에서는 렌더링하지 않음
   if (isDashboardRoute) {
     return null;
   }
 
-  const userName =
-    user?.fullName ||
-    [user?.firstName, user?.lastName].filter(Boolean).join(' ') ||
-    null;
-  const userInitials = getInitials(userName || '사용자');
-  const userImageUrl = user?.imageUrl || null;
+  // Mock 사용자 정보 사용
+  const userName = '시연 사용자';
+  const userInitials = getInitials(userName);
+  const userImageUrl = null;
+  const department = '영업팀';
 
   return (
     <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -106,15 +70,13 @@ export default function Navbar() {
         </p>
       </div>
 
-      {/* 사용자 프로필 (인증된 경우에만 표시) */}
-      {isLoaded && userName && (
-        <UserProfile
-          userName={userName}
-          userInitials={userInitials}
-          userImageUrl={userImageUrl}
-          department={department}
-        />
-      )}
+      {/* 사용자 프로필 */}
+      <UserProfile
+        userName={userName}
+        userInitials={userInitials}
+        userImageUrl={userImageUrl}
+        department={department}
+      />
     </header>
   );
 }

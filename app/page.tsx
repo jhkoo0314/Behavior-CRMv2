@@ -23,12 +23,7 @@
  * - next/link: 라우팅
  */
 
-import { auth, clerkClient } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
 import Link from "next/link";
-import { createClerkSupabaseClient } from "@/lib/supabase/server";
-import { getCurrentUserId } from "@/lib/supabase/get-user-id";
-import { calculateHIR } from "@/lib/analytics/calculate-hir";
 import Image from "next/image";
 
 // SVG 차트 컴포넌트
@@ -77,89 +72,16 @@ function getInitials(name: string): string {
 }
 
 export default async function Home() {
-  // 인증 확인
-  const { userId } = await auth();
+  // 발표용: Mock 데이터 사용
+  const userName = "시연 사용자";
+  const userInitials = getInitials(userName);
+  const userImageUrl: string | null = null;
+  const department = "영업팀";
 
-  if (!userId) {
-    redirect("/sign-in");
-  }
-
-  // Clerk에서 사용자 정보 가져오기
-  let clerkUser;
-  try {
-  const client = await clerkClient();
-    clerkUser = await client.users.getUser(userId);
-  } catch (error) {
-    console.error('Clerk 사용자 정보 조회 실패:', error);
-    // Clerk 조회 실패 시 로그아웃 처리
-    redirect("/sign-in");
-  }
-
-  let userName = "사용자";
-  let userInitials = "U";
-  let userImageUrl: string | null = null;
-  let department = "영업팀";
-
-  if (clerkUser) {
-    // 이름 가져오기
-    userName =
-      clerkUser.fullName ||
-      [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(" ") ||
-      "사용자";
-    userInitials = getInitials(userName);
-
-    // 프로필 이미지 가져오기
-    userImageUrl = clerkUser.imageUrl || null;
-
-    // 부서 정보는 Clerk 메타데이터나 Supabase에서 가져오기
-    const userUuid = await getCurrentUserId();
-    if (userUuid) {
-      const supabase = await createClerkSupabaseClient();
-      const { data: user } = await supabase
-        .from("users")
-        .select("role, team_id")
-        .eq("id", userUuid)
-        .single();
-
-      if (user) {
-        if (user.role === "manager" || user.role === "head_manager") {
-          department = "관리팀";
-        }
-      }
-    }
-  }
-
-  // HIR 지수 계산 (최근 30일)
-  let hirScore = 0;
-  let hirChange = 0;
-  let goalAchievement = 82;
-
-  try {
-    const userUuid = await getCurrentUserId();
-
-  if (userUuid) {
-    try {
-      const periodEnd = new Date();
-      const periodStart = new Date();
-      periodStart.setDate(periodStart.getDate() - 30);
-
-      hirScore = await calculateHIR(userUuid, periodStart, periodEnd);
-
-      // 이전 기간과 비교 (간단히 더미 데이터 사용)
-      // 실제로는 이전 기간의 HIR을 계산하여 비교해야 함
-      hirChange = 12.5; // 더미 데이터
-
-      // Goal Achievement는 HIR 기반으로 계산 (간단한 예시)
-      goalAchievement = Math.min(100, Math.round((hirScore / 100) * 100));
-    } catch (error) {
-      console.error("HIR 계산 실패:", error);
-      // 에러 발생 시 기본값 사용
-    }
-    }
-  } catch (error) {
-    console.error("사용자 ID 조회 실패:", error);
-    // 사용자 ID 조회 실패 시 기본값 사용 (로그아웃 상태일 수 있음)
-  }
+  // Mock HIR 데이터
+  const hirScore = 75;
+  const hirChange = 12.5;
+  const goalAchievement = 82;
 
   return (
     <div className="min-h-screen bg-stone-50 text-stone-800 antialiased">
